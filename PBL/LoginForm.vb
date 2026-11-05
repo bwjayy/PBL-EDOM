@@ -38,20 +38,6 @@ Public Class LoginForm
         End Using
     End Sub
 
-    ' Card Hint Rounded Paint
-    Private Sub pnlHint_Paint(sender As Object, e As PaintEventArgs) Handles pnlHint.Paint
-        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
-        Dim rect As New Rectangle(0, 0, pnlHint.Width - 1, pnlHint.Height - 1)
-        Using path As GraphicsPath = GetRoundedPath(rect, 8)
-            Using br As New SolidBrush(Color.FromArgb(241, 245, 249))
-                e.Graphics.FillPath(br, path)
-            End Using
-            Using penBdr As New Pen(lightBorder, 1.0!)
-                e.Graphics.DrawPath(penBdr, path)
-            End Using
-        End Using
-    End Sub
-
     ' Badge Semester Rounded Paint di Panel Kiri
     Private Sub lblBadgeSemester_Paint(sender As Object, e As PaintEventArgs) Handles lblBadgeSemester.Paint
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
@@ -113,7 +99,6 @@ Public Class LoginForm
 
     ' Proses Login (PURE UI: Tanpa validasi/backend, langsung masuk ke Dashboard!)
     Private Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
-        ' Langsung buka Form Dashboard (Form1)
         Dim dashboard As New Form1()
         dashboard.Show()
 

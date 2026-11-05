@@ -149,7 +149,7 @@ Public Class Form1
             dgvEdom.Rows(rowIndex).Tag = item
         Next
 
-        lblTableCountBadge.Text = matkulTampil.Count.ToString() & " Mata Kuliah"
+        'lblTableCountBadge.Text = matkulTampil.Count.ToString() & " Mata Kuliah"
 
         ' Update KPI Stat Cards
         UpdateKpiCards()
@@ -349,136 +349,6 @@ Public Class Form1
         End If
     End Sub
 
-    ' Klik Tombol "Isi Kuisioner"
-    Private Sub dgvEdom_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvEdom.CellClick
-        If e.RowIndex >= 0 AndAlso e.ColumnIndex = dgvEdom.Columns("colAksi").Index Then
-            Dim item As MatkulItem = TryCast(dgvEdom.Rows(e.RowIndex).Tag, MatkulItem)
-            If item IsNot Nothing Then
-                BukaFormKuisioner(item, e.RowIndex)
-            End If
-        End If
-    End Sub
-
-    ' Modal Kuisioner (Pure UI)
-    Private Sub BukaFormKuisioner(item As MatkulItem, rowIndex As Integer)
-        Using dlg As New Form()
-            dlg.Text = "Evaluasi Dosen - " & item.DosenPengampu
-            dlg.Size = New Size(660, 540)
-            dlg.StartPosition = FormStartPosition.CenterParent
-            dlg.FormBorderStyle = FormBorderStyle.FixedDialog
-            dlg.MaximizeBox = False
-            dlg.MinimizeBox = False
-            dlg.BackColor = Color.FromArgb(248, 250, 252)
-
-            Dim pnlDlgHeader As New Panel With {
-                .Dock = DockStyle.Top,
-                .Height = 75,
-                .BackColor = secondaryDark
-            }
-            Dim lblDlgTitle As New Label With {
-                .Text = "Formulir Evaluasi Dosen Mengajar (EDOM)",
-                .Font = New Font("Segoe UI", 12.0!, FontStyle.Bold),
-                .ForeColor = Color.White,
-                .Location = New Point(22, 14),
-                .AutoSize = True
-            }
-            Dim lblDlgSub As New Label With {
-                .Text = item.KodeMatkul & " - " & item.NamaMatkul & " • " & item.DosenPengampu,
-                .Font = New Font("Segoe UI", 9.0!, FontStyle.Regular),
-                .ForeColor = tertiaryCyan,
-                .Location = New Point(23, 40),
-                .AutoSize = True
-            }
-            pnlDlgHeader.Controls.AddRange({lblDlgTitle, lblDlgSub})
-            dlg.Controls.Add(pnlDlgHeader)
-
-            Dim pnlBody As New Panel With {
-                .Dock = DockStyle.Fill,
-                .Padding = New Padding(24, 18, 24, 18)
-            }
-
-            Dim lblQ1 As New Label With {
-                .Text = "1. Penguasaan materi perkuliahan & kejelasan penjelasan:",
-                .Font = New Font("Segoe UI Semibold", 9.5!, FontStyle.Bold),
-                .Location = New Point(24, 16),
-                .AutoSize = True
-            }
-            Dim cboQ1 As New ComboBox With {
-                .DropDownStyle = ComboBoxStyle.DropDownList,
-                .Location = New Point(24, 40),
-                .Width = 590,
-                .Font = New Font("Segoe UI", 9.5!)
-            }
-            cboQ1.Items.AddRange({"5 - Sangat Baik & Sangat Menguasai", "4 - Baik", "3 - Cukup", "2 - Kurang", "1 - Sangat Kurang"})
-            cboQ1.SelectedIndex = 0
-
-            Dim lblQ2 As New Label With {
-                .Text = "2. Kedisiplinan waktu kehadiran & komitmen perkuliahan:",
-                .Font = New Font("Segoe UI Semibold", 9.5!, FontStyle.Bold),
-                .Location = New Point(24, 80),
-                .AutoSize = True
-            }
-            Dim cboQ2 As New ComboBox With {
-                .DropDownStyle = ComboBoxStyle.DropDownList,
-                .Location = New Point(24, 104),
-                .Width = 590,
-                .Font = New Font("Segoe UI", 9.5!)
-            }
-            cboQ2.Items.AddRange({"5 - Sangat Disiplin & Tepat Waktu", "4 - Tepat Waktu", "3 - Cukup Disiplin", "2 - Kurang Disiplin"})
-            cboQ2.SelectedIndex = 0
-
-            Dim lblQ3 As New Label With {
-                .Text = "3. Masukan, kritik, atau saran konstruktif:",
-                .Font = New Font("Segoe UI Semibold", 9.5!, FontStyle.Bold),
-                .Location = New Point(24, 144),
-                .AutoSize = True
-            }
-            Dim txtFeedback As New TextBox With {
-                .Multiline = True,
-                .Location = New Point(24, 168),
-                .Size = New Size(590, 160),
-                .Font = New Font("Segoe UI", 9.5!),
-                .Text = "Penyampaian materi perkuliahan terstruktur dengan baik dan praktikum sangat membantu pemahaman materi."
-            }
-
-            Dim btnSubmit As New Button With {
-                .Text = "Kirim Evaluasi",
-                .BackColor = primaryBlue,
-                .ForeColor = Color.White,
-                .FlatStyle = FlatStyle.Flat,
-                .Font = New Font("Segoe UI Semibold", 9.5!, FontStyle.Bold),
-                .Size = New Size(140, 40),
-                .Location = New Point(474, 350),
-                .Cursor = Cursors.Hand
-            }
-            btnSubmit.FlatAppearance.BorderSize = 0
-
-            Dim btnCancel As New Button With {
-                .Text = "Batal",
-                .BackColor = Color.White,
-                .ForeColor = neutralSlate,
-                .FlatStyle = FlatStyle.Flat,
-                .Font = New Font("Segoe UI", 9.5!),
-                .Size = New Size(90, 40),
-                .Location = New Point(374, 350),
-                .Cursor = Cursors.Hand
-            }
-
-            AddHandler btnSubmit.Click, Sub()
-                                            item.Status = "Sudah Terisi"
-                                            UpdateFilterData()
-                                            MessageBox.Show("Evaluasi untuk " & item.DosenPengampu & " berhasil disimpan!", "Evaluasi Selesai", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                                            dlg.Close()
-                                        End Sub
-
-            AddHandler btnCancel.Click, Sub() dlg.Close()
-
-            pnlBody.Controls.AddRange({lblQ1, cboQ1, lblQ2, cboQ2, lblQ3, txtFeedback, btnCancel, btnSubmit})
-            dlg.Controls.Add(pnlBody)
-            dlg.ShowDialog(Me)
-        End Using
-    End Sub
-
     ' Logout / Keluar kembali ke Login Page
     Private Sub btnLogout_Click(sender As Object, e As EventArgs) Handles btnLogout.Click
         Dim login As New LoginForm()
@@ -585,34 +455,54 @@ Public Class Form1
     End Function
 
     ' Atur Ukuran Responsif
-    Private Sub Form1_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
+    Private Sub Form1_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize, pnlScrollBody.Resize
         AturLayoutResponsif()
     End Sub
 
     Private Sub AturLayoutResponsif()
         If pnlContent Is Nothing OrElse pnlScrollBody Is Nothing Then Return
 
-        Dim availWidth As Integer = pnlScrollBody.ClientSize.Width - 56
+        ' Lebar area konten: kurangi margin kiri 32px dan margin kanan 32px (total 64px)
+        Dim availWidth As Integer = pnlScrollBody.ClientSize.Width - 64
         If availWidth < 860 Then availWidth = 860
+
+        pnlContent.Left = 32
         pnlContent.Width = availWidth
 
         ' Lebar 3 Card KPI seimbang
         Dim cardSpacing As Integer = 16
         Dim cardWidth As Integer = (availWidth - (cardSpacing * 2)) \ 3
+        cardTotalMatkul.Left = 0
         cardTotalMatkul.Width = cardWidth
-        cardProgress.Width = cardWidth
-        cardDeadline.Width = cardWidth
 
         cardProgress.Left = cardTotalMatkul.Right + cardSpacing
+        cardProgress.Width = cardWidth
+
         cardDeadline.Left = cardProgress.Right + cardSpacing
+        cardDeadline.Width = cardWidth
+
         pnlKpiRow.Width = availWidth
 
-        pnlProgressBarBg.Width = cardProgress.ClientSize.Width - 36
+        If pnlProgressBarBg IsNot Nothing Then
+            pnlProgressBarBg.Width = Math.Max(100, cardProgress.ClientSize.Width - 36)
+        End If
         UpdateKpiCards()
 
-        pnlAlert.Width = availWidth
-        pnlTableCard.Width = availWidth
-        dgvEdom.Width = availWidth - 40
+        If pnlAlert IsNot Nothing Then
+            pnlAlert.Width = availWidth
+            lblAlertText.Width = pnlAlert.ClientSize.Width - 65
+        End If
+
+        If pnlTableCard IsNot Nothing Then
+            pnlTableCard.Width = availWidth
+            If dgvEdom IsNot Nothing Then
+                dgvEdom.Width = pnlTableCard.ClientSize.Width - 42
+            End If
+            If lblTablePeriode IsNot Nothing Then
+                lblTablePeriode.Left = pnlTableCard.ClientSize.Width - lblTablePeriode.Width - 24
+            End If
+            pnlContent.Height = pnlTableCard.Top + pnlTableCard.Height + 35
+        End If
 
         pnlContent.Invalidate(True)
     End Sub
@@ -622,4 +512,7 @@ Public Class Form1
         UpdateFilterData()
     End Sub
 
+    Private Sub dgvEdom_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvEdom.CellContentClick
+
+    End Sub
 End Class
