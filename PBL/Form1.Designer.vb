@@ -70,8 +70,8 @@ Partial Class Form1
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle1 As DataGridViewCellStyle = New DataGridViewCellStyle()
-        Dim DataGridViewCellStyle2 As DataGridViewCellStyle = New DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As DataGridViewCellStyle = New DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As DataGridViewCellStyle = New DataGridViewCellStyle()
         pnlSidebar = New Panel()
         pnlUserCard = New Panel()
         btnLogout = New Button()
@@ -342,24 +342,24 @@ Partial Class Form1
         dgvEdom.BackgroundColor = Color.White
         dgvEdom.BorderStyle = BorderStyle.None
         dgvEdom.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
-        DataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter
-        DataGridViewCellStyle1.BackColor = Color.FromArgb(CByte(248), CByte(250), CByte(252))
-        DataGridViewCellStyle1.Font = New Font("Segoe UI Semibold", 8.75F, FontStyle.Bold)
-        DataGridViewCellStyle1.ForeColor = Color.FromArgb(CByte(71), CByte(85), CByte(105))
-        DataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(CByte(248), CByte(250), CByte(252))
-        DataGridViewCellStyle1.SelectionForeColor = Color.FromArgb(CByte(71), CByte(85), CByte(105))
-        DataGridViewCellStyle1.WrapMode = DataGridViewTriState.True
-        dgvEdom.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle3.BackColor = Color.FromArgb(CByte(248), CByte(250), CByte(252))
+        DataGridViewCellStyle3.Font = New Font("Segoe UI Semibold", 8.75F, FontStyle.Bold)
+        DataGridViewCellStyle3.ForeColor = Color.FromArgb(CByte(71), CByte(85), CByte(105))
+        DataGridViewCellStyle3.SelectionBackColor = Color.FromArgb(CByte(248), CByte(250), CByte(252))
+        DataGridViewCellStyle3.SelectionForeColor = Color.FromArgb(CByte(71), CByte(85), CByte(105))
+        DataGridViewCellStyle3.WrapMode = DataGridViewTriState.True
+        dgvEdom.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle3
         dgvEdom.ColumnHeadersHeight = 44
         dgvEdom.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing
-        DataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle2.BackColor = Color.White
-        DataGridViewCellStyle2.Font = New Font("Segoe UI", 9.25F)
-        DataGridViewCellStyle2.ForeColor = Color.FromArgb(CByte(30), CByte(41), CByte(59))
-        DataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(CByte(241), CByte(245), CByte(249))
-        DataGridViewCellStyle2.SelectionForeColor = Color.FromArgb(CByte(15), CByte(23), CByte(42))
-        DataGridViewCellStyle2.WrapMode = DataGridViewTriState.False
-        dgvEdom.DefaultCellStyle = DataGridViewCellStyle2
+        DataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle4.BackColor = Color.White
+        DataGridViewCellStyle4.Font = New Font("Segoe UI", 9.25F)
+        DataGridViewCellStyle4.ForeColor = Color.FromArgb(CByte(30), CByte(41), CByte(59))
+        DataGridViewCellStyle4.SelectionBackColor = Color.FromArgb(CByte(241), CByte(245), CByte(249))
+        DataGridViewCellStyle4.SelectionForeColor = Color.FromArgb(CByte(15), CByte(23), CByte(42))
+        DataGridViewCellStyle4.WrapMode = DataGridViewTriState.False
+        dgvEdom.DefaultCellStyle = DataGridViewCellStyle4
         dgvEdom.EnableHeadersVisualStyles = False
         dgvEdom.GridColor = Color.FromArgb(CByte(241), CByte(245), CByte(249))
         dgvEdom.Location = New Point(21, 69)

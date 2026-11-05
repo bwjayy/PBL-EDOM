@@ -6,10 +6,10 @@ Public Class LoginForm
 
     ' Warna Palette dari Referensi Gambar
     Private ReadOnly primaryBlue As Color = Color.FromArgb(30, 58, 138)     ' #1E3A8A
-    Private ReadOnly secondaryDark As Color = Color.FromArgb(15, 23, 42)    ' #0F172A
+
     Private ReadOnly tertiaryCyan As Color = Color.FromArgb(2, 132, 199)    ' #0284C7
-    Private ReadOnly neutralSlate As Color = Color.FromArgb(100, 116, 139)  ' #64748B
-    Private ReadOnly lightBorder As Color = Color.FromArgb(226, 232, 240)   ' #E2E8F0
+
+
 
     Private Sub LoginForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         btnLogin.FlatStyle = FlatStyle.Flat
