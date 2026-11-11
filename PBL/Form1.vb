@@ -4,46 +4,62 @@ Imports System.Windows.Forms
 
 Public Class Form1
 
-    ' Design System Palette
-    Private ReadOnly primaryBlue As Color = Color.FromArgb(30, 58, 138)       ' #1E3A8A
-    Private ReadOnly tertiaryCyan As Color = Color.FromArgb(2, 132, 199)      ' #0284C7
-    Private ReadOnly cardBorderColor As Color = Color.FromArgb(226, 232, 240) ' #E2E8F0
+    Private ReadOnly colorNavy As Color = Color.FromArgb(10, 37, 88)
+    Private ReadOnly colorNavyHover As Color = Color.FromArgb(14, 48, 112)
+    Private ReadOnly colorBorder As Color = Color.FromArgb(226, 232, 240)
+    Private ReadOnly colorMuted As Color = Color.FromArgb(100, 116, 139)
+    Private ReadOnly colorDark As Color = Color.FromArgb(15, 23, 42)
+    Private ReadOnly colorAmber As Color = Color.FromArgb(217, 119, 6)
+    Private ReadOnly colorAmberBg As Color = Color.FromArgb(254, 243, 199)
+    Private ReadOnly colorAmberText As Color = Color.FromArgb(180, 83, 9)
+    Private ReadOnly colorGreen As Color = Color.FromArgb(5, 150, 105)
+    Private ReadOnly colorGreenBg As Color = Color.FromArgb(236, 253, 245)
+    Private ReadOnly colorBlue As Color = Color.FromArgb(37, 99, 235)
+    Private ReadOnly colorBlueBg As Color = Color.FromArgb(239, 246, 255)
+
+    Private currentTab As String = "ALL"
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        ' Dropdown Tahun Akademik
         cboTahunAkademik.Items.AddRange(New Object() {"2026/2027 Ganjil", "2025/2026 Genap", "2025/2026 Ganjil"})
         cboTahunAkademik.SelectedIndex = 0
 
-        ' Setup DataGridView
         SetupDataGridView()
+        LoadStaticData()
+        ApplyControlRegions()
+        AturLayoutResponsif()
+    End Sub
 
-        ' Static Data 10 Mata Kuliah EDOM Kelas 3C
+    Private Sub ApplyControlRegions()
+        btnNavDashboard.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnNavDashboard.Width, btnNavDashboard.Height), 8))
+        btnLogout.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnLogout.Width, btnLogout.Height), 6))
+        btnTabAll.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnTabAll.Width, btnTabAll.Height), 6))
+        btnTabPending.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnTabPending.Width, btnTabPending.Height), 6))
+    End Sub
+
+    Private Sub LoadStaticData()
+        dgvEdom.Rows.Clear()
         Dim data = {
-            New Object() {1, "TIK309 - Grafika Komputer (3C)", "ANGGI MARDIYONO", "• Belum Terisi"},
-            New Object() {2, "TIK308 - Analisis dan Desain Sistem Informasi (3C)", "ANITA HIDAYATI", "• Belum Terisi"},
-            New Object() {3, "TIK306 - Pemrograman Web Lanjut (3C)", "ASEP TAUFIK MUHARRAM", "• Belum Terisi"},
-            New Object() {4, "TIK302 - Manajemen Proyek TIK (3C)", "BAMBANG WARSUTA", "• Belum Terisi"},
-            New Object() {5, "TIK301 - Pemrograman Visual (3C)", "CHAIRUL FIKRI", "• Belum Terisi"},
-            New Object() {6, "TIK310 - Sistem Terdistribusi (3C)", "DEFIANA ARNALDY", "• Belum Terisi"},
-            New Object() {7, "TIK305 - Metode Numerik (3C)", "FAJAR SEPTIAN", "• Belum Terisi"},
-            New Object() {8, "TIK303 - Desain UI/UX (3C)", "IWAN SONJAYA", "• Belum Terisi"},
-            New Object() {9, "TIK307 - Pemrograman Basis Data (3C)", "RISNA SARI", "• Belum Terisi"},
-            New Object() {10, "TIK304 - Kecerdasan Buatan (3C)", "RIZKI ELISA NALAWATI", "• Belum Terisi"}
+            New Object() {1, "TIK309 - Grafika Komputer (3C)", "ANGGI MARDIYONO", "• Belum Terisi", "Isi Kuisioner"},
+            New Object() {2, "TIK308 - Analisis dan Desain Sistem Informasi (3C)", "ANITA HIDAYATI", "• Belum Terisi", "Isi Kuisioner"},
+            New Object() {3, "TIK306 - Pemrograman Web Lanjut (3C)", "ASEP TAUFIK MUHARRAM", "• Belum Terisi", "Isi Kuisioner"},
+            New Object() {4, "TIK302 - Manajemen Proyek TIK (3C)", "BAMBANG WARSUTA", "• Belum Terisi", "Isi Kuisioner"},
+            New Object() {5, "TIK301 - Pemrograman Visual (3C)", "CHAIRUL FIKRI", "• Belum Terisi", "Isi Kuisioner"},
+            New Object() {6, "TIK310 - Sistem Terdistribusi (3C)", "DEFIANA ARNALDY", "• Belum Terisi", "Isi Kuisioner"},
+            New Object() {7, "TIK305 - Metode Numerik (3C)", "FAJAR SEPTIAN", "• Belum Terisi", "Isi Kuisioner"},
+            New Object() {8, "TIK303 - Desain UI/UX (3C)", "IWAN SONJAYA", "• Belum Terisi", "Isi Kuisioner"},
+            New Object() {9, "TIK307 - Pemrograman Basis Data (3C)", "RISNA SARI", "• Belum Terisi", "Isi Kuisioner"},
+            New Object() {10, "TIK304 - Kecerdasan Buatan (3C)", "RIZKI ELISA NALAWATI", "• Belum Terisi", "Isi Kuisioner"}
         }
         For Each row In data
             dgvEdom.Rows.Add(row)
         Next
 
-        ' Sesuaikan tinggi DataGridView & Container
-        dgvEdom.Height = dgvEdom.ColumnHeadersHeight + (dgvEdom.Rows.Count * dgvEdom.RowTemplate.Height) + 10
-        pnlTableCard.Height = dgvEdom.Top + dgvEdom.Height + 25
+        dgvEdom.Height = dgvEdom.ColumnHeadersHeight + (dgvEdom.Rows.Count * dgvEdom.RowTemplate.Height) + 4
+        pnlTableCard.Height = dgvEdom.Top + dgvEdom.Height + 24
 
-        ' Static KPI Cards
         lblKpi1Value.Text = "10 Matakuliah"
         lblKpi2Value.Text = "0 / 10 Selesai (0%)"
         pnlProgressBarFill.Width = 0
-
-        AturLayoutResponsif()
     End Sub
 
     Private Sub SetupDataGridView()
@@ -59,80 +75,105 @@ Public Class Form1
         dgvEdom.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
         dgvEdom.GridColor = Color.FromArgb(241, 245, 249)
         dgvEdom.RowTemplate.Height = 52
-        dgvEdom.ColumnHeadersHeight = 44
+        dgvEdom.ColumnHeadersHeight = 42
 
-        ' 1. NO
         dgvEdom.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "colNo", .HeaderText = "NO", .Width = 55,
             .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter}
         })
 
-        ' 2. MATAKULIAH
         dgvEdom.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "colMatkul", .HeaderText = "MATA KULIAH",
             .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .FillWeight = 45.0!,
             .DefaultCellStyle = New DataGridViewCellStyle With {.Padding = New Padding(12, 0, 10, 0)}
         })
 
-        ' 3. DOSEN PENGAMPU
         dgvEdom.Columns.Add(New DataGridViewTextBoxColumn With {
             .Name = "colDosen", .HeaderText = "DOSEN PENGAMPU",
             .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .FillWeight = 35.0!,
             .DefaultCellStyle = New DataGridViewCellStyle With {.Padding = New Padding(10, 0, 10, 0)}
         })
 
-        ' 4. STATUS (Pill / Text)
         dgvEdom.Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "colStatus", .HeaderText = "STATUS", .Width = 140,
-            .DefaultCellStyle = New DataGridViewCellStyle With {
-                .Alignment = DataGridViewContentAlignment.MiddleCenter,
-                .ForeColor = Color.FromArgb(220, 38, 38),
-                .Font = New Font("Segoe UI Semibold", 9.0!, FontStyle.Bold)
-            }
+            .Name = "colStatus", .HeaderText = "STATUS", .Width = 145,
+            .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter}
         })
 
-        ' 5. AKSI (Native Flat Button)
-        Dim colAksi As New DataGridViewButtonColumn With {
-            .Name = "colAksi", .HeaderText = "AKSI", .Width = 140,
-            .FlatStyle = FlatStyle.Flat, .Text = "Isi Kuisioner", .UseColumnTextForButtonValue = True
-        }
-        colAksi.DefaultCellStyle.BackColor = primaryBlue
-        colAksi.DefaultCellStyle.ForeColor = Color.White
-        colAksi.DefaultCellStyle.SelectionBackColor = primaryBlue
-        colAksi.DefaultCellStyle.SelectionForeColor = Color.White
-        colAksi.DefaultCellStyle.Padding = New Padding(10, 8, 10, 8)
-        dgvEdom.Columns.Add(colAksi)
+        dgvEdom.Columns.Add(New DataGridViewTextBoxColumn With {
+            .Name = "colAksi", .HeaderText = "AKSI", .Width = 135,
+            .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter}
+        })
     End Sub
 
-    ' Real-time search filter menggunakan native row visibility
-    Private Sub txtSearch_TextChanged(sender As Object, e As EventArgs) Handles txtSearch.TextChanged
-        Dim q As String = txtSearch.Text.Trim().ToLower()
-        For Each row As DataGridViewRow In dgvEdom.Rows
-            Dim matkul As String = If(row.Cells(1).Value IsNot Nothing, row.Cells(1).Value.ToString().ToLower(), "")
-            Dim dosen As String = If(row.Cells(2).Value IsNot Nothing, row.Cells(2).Value.ToString().ToLower(), "")
-            row.Visible = String.IsNullOrEmpty(q) OrElse matkul.Contains(q) OrElse dosen.Contains(q)
-        Next
+    ' Render pill badge status dan tombol aksi kustom menyerupai referensi
+    Private Sub dgvEdom_CellPainting(sender As Object, e As DataGridViewCellPaintingEventArgs) Handles dgvEdom.CellPainting
+        If e.RowIndex < 0 Then Return
+
+        ' Status Pill
+        If e.ColumnIndex = 3 AndAlso e.Value IsNot Nothing Then
+            e.PaintBackground(e.CellBounds, True)
+            Dim text As String = e.Value.ToString()
+            Dim pillRect As New Rectangle(e.CellBounds.X + (e.CellBounds.Width - 116) \ 2, e.CellBounds.Y + (e.CellBounds.Height - 26) \ 2, 116, 26)
+
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
+            Using path As GraphicsPath = GetRoundedPath(pillRect, 13), brBg As New SolidBrush(colorAmberBg)
+                e.Graphics.FillPath(brBg, path)
+            End Using
+
+            Using fontPill As New Font("Segoe UI Semibold", 8.5!, FontStyle.Bold),
+                  brText As New SolidBrush(colorAmberText),
+                  sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
+                e.Graphics.DrawString(text, fontPill, brText, pillRect, sf)
+            End Using
+            e.Handled = True
+            Return
+        End If
+
+        ' Action Button Pill
+        If e.ColumnIndex = 4 Then
+            e.PaintBackground(e.CellBounds, True)
+            Dim btnRect As New Rectangle(e.CellBounds.X + (e.CellBounds.Width - 110) \ 2, e.CellBounds.Y + (e.CellBounds.Height - 30) \ 2, 110, 30)
+
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
+            Using path As GraphicsPath = GetRoundedPath(btnRect, 6), brBg As New SolidBrush(colorNavy)
+                e.Graphics.FillPath(brBg, path)
+            End Using
+
+            Using fontBtn As New Font("Segoe UI Semibold", 8.5!, FontStyle.Bold),
+                  brText As New SolidBrush(Color.White),
+                  sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
+                e.Graphics.DrawString("Isi Kuisioner", fontBtn, brText, btnRect, sf)
+            End Using
+            e.Handled = True
+            Return
+        End If
     End Sub
 
-    ' Logout kembali ke Login Form
-    Private Sub btnLogout_Click(sender As Object, e As EventArgs) Handles btnLogout.Click
-        Dim login As New LoginForm()
-        login.Show()
-        Me.Close()
+    Private Sub pnlSidebar_Paint(sender As Object, e As PaintEventArgs) Handles pnlSidebar.Paint
+        Using penBdr As New Pen(colorBorder, 1.0!)
+            e.Graphics.DrawLine(penBdr, pnlSidebar.Width - 1, 0, pnlSidebar.Width - 1, pnlSidebar.Height)
+        End Using
     End Sub
 
-    ' =========================================================================
-    ' MODERN UI COSMETICS: LOGO, AVATAR, & ROUNDED CARD BORDERS
-    ' =========================================================================
+    Private Sub pnlTopbar_Paint(sender As Object, e As PaintEventArgs) Handles pnlTopbar.Paint
+        Using penBdr As New Pen(colorBorder, 1.0!)
+            e.Graphics.DrawLine(penBdr, 0, pnlTopbar.Height - 1, pnlTopbar.Width, pnlTopbar.Height - 1)
+        End Using
+    End Sub
+
+    Private Sub pnlUserCard_Paint(sender As Object, e As PaintEventArgs) Handles pnlUserCard.Paint
+        Using penBdr As New Pen(colorBorder, 1.0!)
+            e.Graphics.DrawLine(penBdr, 0, 0, pnlUserCard.Width, 0)
+        End Using
+    End Sub
+
     Private Sub picSidebarLogo_Paint(sender As Object, e As PaintEventArgs) Handles picSidebarLogo.Paint
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
-        Dim rect As New Rectangle(2, 2, picSidebarLogo.Width - 5, picSidebarLogo.Height - 5)
-        Using path As GraphicsPath = GetRoundedPath(rect, 12)
-            Using br As New LinearGradientBrush(rect, primaryBlue, tertiaryCyan, 45.0!)
-                e.Graphics.FillPath(br, path)
-            End Using
+        Dim rect As New Rectangle(1, 1, picSidebarLogo.Width - 3, picSidebarLogo.Height - 3)
+        Using path As GraphicsPath = GetRoundedPath(rect, 8), br As New SolidBrush(colorNavy)
+            e.Graphics.FillPath(br, path)
         End Using
-        Using fontLogo As New Font("Segoe UI", 16.0!, FontStyle.Bold), brWhite As New SolidBrush(Color.White)
+        Using fontLogo As New Font("Segoe UI", 13.0!, FontStyle.Bold), brWhite As New SolidBrush(Color.White)
             e.Graphics.DrawString("E", fontLogo, brWhite, rect, New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center})
         End Using
     End Sub
@@ -140,21 +181,66 @@ Public Class Form1
     Private Sub picUserAvatar_Paint(sender As Object, e As PaintEventArgs) Handles picUserAvatar.Paint
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
         Dim rect As New Rectangle(1, 1, picUserAvatar.Width - 3, picUserAvatar.Height - 3)
-        Using brBg As New SolidBrush(primaryBlue)
+        Using brBg As New SolidBrush(colorNavy)
             e.Graphics.FillEllipse(brBg, rect)
         End Using
-        Using fontAvatar As New Font("Segoe UI Semibold", 10.0!, FontStyle.Bold), brText As New SolidBrush(Color.White)
+        Using fontAvatar As New Font("Segoe UI Semibold", 9.0!, FontStyle.Bold), brText As New SolidBrush(Color.White)
             e.Graphics.DrawString("BW", fontAvatar, brText, rect, New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center})
         End Using
     End Sub
 
-    Private Sub ModernCard_Paint(sender As Object, e As PaintEventArgs) Handles cardTotalMatkul.Paint, cardProgress.Paint, cardDeadline.Paint, pnlTableCard.Paint
+    Private Sub ModernCard_Paint(sender As Object, e As PaintEventArgs) Handles pnlTableCard.Paint
         Dim pnl = CType(sender, Panel)
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
         Dim rect As New Rectangle(0, 0, pnl.Width - 1, pnl.Height - 1)
-        Using path As GraphicsPath = GetRoundedPath(rect, 10), br As New SolidBrush(Color.White), penBdr As New Pen(cardBorderColor, 1.0!)
+        Using path As GraphicsPath = GetRoundedPath(rect, 10), br As New SolidBrush(Color.White), penBdr As New Pen(colorBorder, 1.0!)
             e.Graphics.FillPath(br, path)
             e.Graphics.DrawPath(penBdr, path)
+        End Using
+    End Sub
+
+    Private Sub cardTotalMatkul_Paint(sender As Object, e As PaintEventArgs) Handles cardTotalMatkul.Paint
+        DrawKpiCard(cardTotalMatkul, e.Graphics, colorBlueBg, colorBlue, 1)
+    End Sub
+
+    Private Sub cardProgress_Paint(sender As Object, e As PaintEventArgs) Handles cardProgress.Paint
+        DrawKpiCard(cardProgress, e.Graphics, colorAmberBg, colorAmber, 2)
+    End Sub
+
+    Private Sub cardDeadline_Paint(sender As Object, e As PaintEventArgs) Handles cardDeadline.Paint
+        DrawKpiCard(cardDeadline, e.Graphics, colorGreenBg, colorGreen, 3)
+    End Sub
+
+    Private Sub DrawKpiCard(card As Panel, g As Graphics, badgeBg As Color, iconColor As Color, iconType As Integer)
+        g.SmoothingMode = SmoothingMode.AntiAlias
+        Dim rect As New Rectangle(0, 0, card.Width - 1, card.Height - 1)
+        Using path As GraphicsPath = GetRoundedPath(rect, 10), br As New SolidBrush(Color.White), penBdr As New Pen(colorBorder, 1.0!)
+            g.FillPath(br, path)
+            g.DrawPath(penBdr, path)
+        End Using
+
+        ' Top-right rounded badge icon
+        Dim badgeRect As New Rectangle(card.Width - 46, 16, 30, 30)
+        Using bPath As GraphicsPath = GetRoundedPath(badgeRect, 6), bBr As New SolidBrush(badgeBg)
+            g.FillPath(bBr, bPath)
+        End Using
+
+        Using penIcon As New Pen(iconColor, 1.4!)
+            Select Case iconType
+                Case 1 ' Document outline
+                    Dim docRect As New Rectangle(badgeRect.X + 8, badgeRect.Y + 7, 13, 16)
+                    g.DrawRectangle(penIcon, docRect)
+                    g.DrawLine(penIcon, docRect.X + 3, docRect.Y + 4, docRect.Right - 3, docRect.Y + 4)
+                    g.DrawLine(penIcon, docRect.X + 3, docRect.Y + 8, docRect.Right - 3, docRect.Y + 8)
+                Case 2 ' Clipboard / Clock
+                    Dim boxRect As New Rectangle(badgeRect.X + 7, badgeRect.Y + 7, 15, 16)
+                    g.DrawRectangle(penIcon, boxRect)
+                    g.DrawArc(penIcon, badgeRect.X + 11, badgeRect.Y + 4, 7, 5, 180, 180)
+                Case 3 ' Calendar / Check
+                    Dim calRect As New Rectangle(badgeRect.X + 7, badgeRect.Y + 8, 15, 14)
+                    g.DrawRectangle(penIcon, calRect)
+                    g.DrawLine(penIcon, calRect.X, calRect.Y + 4, calRect.Right, calRect.Y + 4)
+            End Select
         End Using
     End Sub
 
@@ -170,31 +256,65 @@ Public Class Form1
     Private Sub pnlSearchBox_Paint(sender As Object, e As PaintEventArgs) Handles pnlSearchBox.Paint
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
         Dim rect As New Rectangle(0, 0, pnlSearchBox.Width - 1, pnlSearchBox.Height - 1)
-        Using path As GraphicsPath = GetRoundedPath(rect, 16), br As New SolidBrush(Color.FromArgb(248, 250, 252)), penBdr As New Pen(cardBorderColor, 1.0!)
+        Using path As GraphicsPath = GetRoundedPath(rect, 14), br As New SolidBrush(Color.FromArgb(248, 250, 252)), penBdr As New Pen(colorBorder, 1.0!)
             e.Graphics.FillPath(br, path)
             e.Graphics.DrawPath(penBdr, path)
         End Using
+
+        ' Search magnifying glass glyph
+        Using penIcon As New Pen(colorMuted, 1.4!)
+            e.Graphics.DrawEllipse(penIcon, 12, 11, 9, 9)
+            e.Graphics.DrawLine(penIcon, 19, 18, 24, 23)
+        End Using
     End Sub
 
-    Private Function GetRoundedPath(rect As Rectangle, radius As Integer) As GraphicsPath
-        Dim path As New GraphicsPath()
-        Dim d As Integer = radius * 2
-        path.AddArc(rect.X, rect.Y, d, d, 180, 90)
-        path.AddArc(rect.Right - d, rect.Y, d, d, 270, 90)
-        path.AddArc(rect.Right - d, rect.Bottom - d, d, d, 0, 90)
-        path.AddArc(rect.X, rect.Bottom - d, d, d, 90, 90)
-        path.CloseFigure()
-        Return path
-    End Function
+    ' Filter Tab buttons
+    Private Sub btnTabAll_Click(sender As Object, e As EventArgs) Handles btnTabAll.Click
+        currentTab = "ALL"
+        btnTabAll.BackColor = colorNavy
+        btnTabAll.ForeColor = Color.White
+        btnTabPending.BackColor = Color.FromArgb(241, 245, 249)
+        btnTabPending.ForeColor = colorMuted
+        ApplyFilter()
+    End Sub
 
-    ' Layout Responsif Lebar Penuh
+    Private Sub btnTabPending_Click(sender As Object, e As EventArgs) Handles btnTabPending.Click
+        currentTab = "PENDING"
+        btnTabPending.BackColor = colorNavy
+        btnTabPending.ForeColor = Color.White
+        btnTabAll.BackColor = Color.FromArgb(241, 245, 249)
+        btnTabAll.ForeColor = colorMuted
+        ApplyFilter()
+    End Sub
+
+    Private Sub txtSearch_TextChanged(sender As Object, e As EventArgs) Handles txtSearch.TextChanged
+        ApplyFilter()
+    End Sub
+
+    Private Sub ApplyFilter()
+        Dim q As String = txtSearch.Text.Trim().ToLower()
+        For Each row As DataGridViewRow In dgvEdom.Rows
+            Dim matkul As String = If(row.Cells(1).Value IsNot Nothing, row.Cells(1).Value.ToString().ToLower(), "")
+            Dim dosen As String = If(row.Cells(2).Value IsNot Nothing, row.Cells(2).Value.ToString().ToLower(), "")
+            Dim matchText As Boolean = String.IsNullOrEmpty(q) OrElse matkul.Contains(q) OrElse dosen.Contains(q)
+            Dim matchTab As Boolean = (currentTab = "ALL") OrElse (currentTab = "PENDING")
+            row.Visible = matchText AndAlso matchTab
+        Next
+    End Sub
+
+    Private Sub btnLogout_Click(sender As Object, e As EventArgs) Handles btnLogout.Click
+        Dim login As New LoginForm()
+        login.Show()
+        Me.Close()
+    End Sub
+
     Private Sub Form1_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize, pnlScrollBody.Resize
         AturLayoutResponsif()
     End Sub
 
     Private Sub AturLayoutResponsif()
         If pnlContent Is Nothing OrElse pnlScrollBody Is Nothing Then Return
-        Dim w As Integer = Math.Max(860, pnlScrollBody.ClientSize.Width - 64)
+        Dim w As Integer = Math.Max(840, pnlScrollBody.ClientSize.Width - 64)
         pnlContent.Left = 32
         pnlContent.Width = w
 
@@ -205,12 +325,25 @@ Public Class Form1
         pnlKpiRow.Width = w
 
         pnlAlert.Width = w
-        lblAlertText.Width = w - 65
+        lblAlertText.Width = w - 40
 
         pnlTableCard.Width = w
         dgvEdom.Width = w - 42
-        lblTablePeriode.Left = w - lblTablePeriode.Width - 24
-        pnlContent.Height = pnlTableCard.Bottom + 35
+        lblTablePeriode.Left = w - lblTablePeriode.Width - 21
+        pnlContent.Height = pnlTableCard.Bottom + 32
     End Sub
+
+    Private Function GetRoundedPath(rect As Rectangle, radius As Integer) As GraphicsPath
+        Dim path As New GraphicsPath()
+        Dim d As Integer = radius * 2
+        If d > rect.Width Then d = rect.Width
+        If d > rect.Height Then d = rect.Height
+        path.AddArc(rect.X, rect.Y, d, d, 180, 90)
+        path.AddArc(rect.Right - d, rect.Y, d, d, 270, 90)
+        path.AddArc(rect.Right - d, rect.Bottom - d, d, d, 0, 90)
+        path.AddArc(rect.X, rect.Bottom - d, d, d, 90, 90)
+        path.CloseFigure()
+        Return path
+    End Function
 
 End Class

@@ -15,288 +15,214 @@ Partial Class LoginForm
 
     Private components As System.ComponentModel.IContainer
 
-    ' Controls
-    Friend WithEvents pnlLeft As System.Windows.Forms.Panel
-    Friend WithEvents lblBrandTitle As System.Windows.Forms.Label
-    Friend WithEvents lblBrandSubtitle As System.Windows.Forms.Label
-    Friend WithEvents lblBadgeSemester As System.Windows.Forms.Label
-    Friend WithEvents picBrandLogo As System.Windows.Forms.PictureBox
-
-    Friend WithEvents pnlRight As System.Windows.Forms.Panel
-    Friend WithEvents lblLoginTitle As System.Windows.Forms.Label
-    Friend WithEvents lblLoginSub As System.Windows.Forms.Label
-    Friend WithEvents lblUsername As System.Windows.Forms.Label
-    Friend WithEvents txtUsername As System.Windows.Forms.TextBox
-    Friend WithEvents pnlUsernameUnderline As System.Windows.Forms.Panel
+    Friend WithEvents pnlCard As System.Windows.Forms.Panel
+    Friend WithEvents lblTitle As System.Windows.Forms.Label
+    Friend WithEvents lblSubtitle As System.Windows.Forms.Label
+    Friend WithEvents lblEmail As System.Windows.Forms.Label
+    Friend WithEvents pnlEmailInput As System.Windows.Forms.Panel
+    Friend WithEvents txtEmail As System.Windows.Forms.TextBox
     Friend WithEvents lblPassword As System.Windows.Forms.Label
+    Friend WithEvents pnlPasswordInput As System.Windows.Forms.Panel
+    Friend WithEvents picLockIcon As System.Windows.Forms.PictureBox
     Friend WithEvents txtPassword As System.Windows.Forms.TextBox
-    Friend WithEvents pnlPasswordUnderline As System.Windows.Forms.Panel
-    Friend WithEvents chkRemember As System.Windows.Forms.CheckBox
-    Friend WithEvents lblForgotPassword As System.Windows.Forms.Label
     Friend WithEvents btnLogin As System.Windows.Forms.Button
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        pnlLeft = New Panel()
-        lblBadgeSemester = New Label()
-        lblBrandSubtitle = New Label()
-        lblBrandTitle = New Label()
-        picBrandLogo = New PictureBox()
-        pnlRight = New Panel()
+        pnlCard = New Panel()
         btnLogin = New Button()
-        lblForgotPassword = New Label()
-        chkRemember = New CheckBox()
-        pnlPasswordUnderline = New Panel()
+        pnlPasswordInput = New Panel()
         txtPassword = New TextBox()
+        picLockIcon = New PictureBox()
         lblPassword = New Label()
-        pnlUsernameUnderline = New Panel()
-        txtUsername = New TextBox()
-        lblUsername = New Label()
-        lblLoginSub = New Label()
-        lblLoginTitle = New Label()
-        pnlLeft.SuspendLayout()
-        CType(picBrandLogo, ComponentModel.ISupportInitialize).BeginInit()
-        pnlRight.SuspendLayout()
+        pnlEmailInput = New Panel()
+        txtEmail = New TextBox()
+        lblEmail = New Label()
+        lblSubtitle = New Label()
+        lblTitle = New Label()
+        picTogglePassword = New PictureBox()
+        picMailIcon = New PictureBox()
+        pnlCard.SuspendLayout()
+        pnlPasswordInput.SuspendLayout()
+        CType(picLockIcon, ComponentModel.ISupportInitialize).BeginInit()
+        pnlEmailInput.SuspendLayout()
+        CType(picTogglePassword, ComponentModel.ISupportInitialize).BeginInit()
+        CType(picMailIcon, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
-        ' pnlLeft
+        ' pnlCard
         ' 
-        pnlLeft.BackColor = Color.FromArgb(CByte(15), CByte(23), CByte(42))
-        pnlLeft.Controls.Add(lblBadgeSemester)
-        pnlLeft.Controls.Add(lblBrandSubtitle)
-        pnlLeft.Controls.Add(lblBrandTitle)
-        pnlLeft.Controls.Add(picBrandLogo)
-        pnlLeft.Dock = DockStyle.Left
-        pnlLeft.Location = New Point(0, 0)
-        pnlLeft.Margin = New Padding(3, 4, 3, 4)
-        pnlLeft.Name = "pnlLeft"
-        pnlLeft.Padding = New Padding(41, 48, 41, 48)
-        pnlLeft.Size = New Size(389, 693)
-        pnlLeft.TabIndex = 0
-        ' 
-        ' lblBadgeSemester
-        ' 
-        lblBadgeSemester.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
-        lblBadgeSemester.BackColor = Color.FromArgb(CByte(30), CByte(41), CByte(59))
-        lblBadgeSemester.Font = New Font("Segoe UI Semibold", 8.5F, FontStyle.Bold)
-        lblBadgeSemester.ForeColor = Color.FromArgb(CByte(226), CByte(232), CByte(240))
-        lblBadgeSemester.Location = New Point(41, 580)
-        lblBadgeSemester.Name = "lblBadgeSemester"
-        lblBadgeSemester.Padding = New Padding(11, 8, 11, 8)
-        lblBadgeSemester.Size = New Size(303, 45)
-        lblBadgeSemester.TabIndex = 4
-        lblBadgeSemester.Text = "Tahun Akademik: 2026/2027 Ganjil"
-        lblBadgeSemester.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' lblBrandSubtitle
-        ' 
-        lblBrandSubtitle.AutoSize = True
-        lblBrandSubtitle.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold)
-        lblBrandSubtitle.ForeColor = Color.FromArgb(CByte(2), CByte(132), CByte(199))
-        lblBrandSubtitle.Location = New Point(39, 197)
-        lblBrandSubtitle.Name = "lblBrandSubtitle"
-        lblBrandSubtitle.Size = New Size(247, 23)
-        lblBrandSubtitle.TabIndex = 2
-        lblBrandSubtitle.Text = "Politeknik Negeri Jakarta (PNJ)"
-        ' 
-        ' lblBrandTitle
-        ' 
-        lblBrandTitle.AutoSize = True
-        lblBrandTitle.Font = New Font("Segoe UI", 16.0F, FontStyle.Bold)
-        lblBrandTitle.ForeColor = Color.White
-        lblBrandTitle.Location = New Point(37, 153)
-        lblBrandTitle.Name = "lblBrandTitle"
-        lblBrandTitle.Size = New Size(183, 37)
-        lblBrandTitle.TabIndex = 1
-        lblBrandTitle.Text = "EDOM Portal"
-        ' 
-        ' picBrandLogo
-        ' 
-        picBrandLogo.Location = New Point(41, 60)
-        picBrandLogo.Margin = New Padding(3, 4, 3, 4)
-        picBrandLogo.Name = "picBrandLogo"
-        picBrandLogo.Size = New Size(62, 72)
-        picBrandLogo.SizeMode = PictureBoxSizeMode.CenterImage
-        picBrandLogo.TabIndex = 0
-        picBrandLogo.TabStop = False
-        ' 
-        ' pnlRight
-        ' 
-        pnlRight.BackColor = Color.White
-        pnlRight.Controls.Add(btnLogin)
-        pnlRight.Controls.Add(lblForgotPassword)
-        pnlRight.Controls.Add(chkRemember)
-        pnlRight.Controls.Add(pnlPasswordUnderline)
-        pnlRight.Controls.Add(txtPassword)
-        pnlRight.Controls.Add(lblPassword)
-        pnlRight.Controls.Add(pnlUsernameUnderline)
-        pnlRight.Controls.Add(txtUsername)
-        pnlRight.Controls.Add(lblUsername)
-        pnlRight.Controls.Add(lblLoginSub)
-        pnlRight.Controls.Add(lblLoginTitle)
-        pnlRight.Dock = DockStyle.Fill
-        pnlRight.Location = New Point(389, 0)
-        pnlRight.Margin = New Padding(3, 4, 3, 4)
-        pnlRight.Name = "pnlRight"
-        pnlRight.Padding = New Padding(55, 53, 55, 40)
-        pnlRight.Size = New Size(553, 693)
-        pnlRight.TabIndex = 1
+        pnlCard.BackColor = Color.White
+        pnlCard.Controls.Add(btnLogin)
+        pnlCard.Controls.Add(pnlPasswordInput)
+        pnlCard.Controls.Add(lblPassword)
+        pnlCard.Controls.Add(pnlEmailInput)
+        pnlCard.Controls.Add(lblEmail)
+        pnlCard.Controls.Add(lblSubtitle)
+        pnlCard.Controls.Add(lblTitle)
+        pnlCard.Location = New Point(160, 95)
+        pnlCard.Name = "pnlCard"
+        pnlCard.Size = New Size(400, 360)
+        pnlCard.TabIndex = 0
         ' 
         ' btnLogin
         ' 
-        btnLogin.BackColor = Color.FromArgb(CByte(30), CByte(58), CByte(138))
+        btnLogin.BackColor = Color.FromArgb(CByte(10), CByte(37), CByte(88))
         btnLogin.Cursor = Cursors.Hand
         btnLogin.FlatAppearance.BorderSize = 0
         btnLogin.FlatStyle = FlatStyle.Flat
-        btnLogin.Font = New Font("Segoe UI Semibold", 10.0F, FontStyle.Bold)
+        btnLogin.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold)
         btnLogin.ForeColor = Color.White
-        btnLogin.Location = New Point(55, 400)
-        btnLogin.Margin = New Padding(3, 4, 3, 4)
+        btnLogin.Location = New Point(32, 276)
         btnLogin.Name = "btnLogin"
-        btnLogin.Size = New Size(443, 59)
-        btnLogin.TabIndex = 10
-        btnLogin.Text = "Masuk ke Dashboard"
+        btnLogin.Size = New Size(336, 44)
+        btnLogin.TabIndex = 6
+        btnLogin.Text = "➔   Masuk"
         btnLogin.UseVisualStyleBackColor = False
         ' 
-        ' lblForgotPassword
+        ' pnlPasswordInput
         ' 
-        lblForgotPassword.AutoSize = True
-        lblForgotPassword.Cursor = Cursors.Hand
-        lblForgotPassword.Font = New Font("Segoe UI Semibold", 9.0F, FontStyle.Bold)
-        lblForgotPassword.ForeColor = Color.FromArgb(CByte(2), CByte(132), CByte(199))
-        lblForgotPassword.Location = New Point(384, 344)
-        lblForgotPassword.Name = "lblForgotPassword"
-        lblForgotPassword.Size = New Size(122, 20)
-        lblForgotPassword.TabIndex = 9
-        lblForgotPassword.Text = "Lupa kata sandi?"
-        ' 
-        ' chkRemember
-        ' 
-        chkRemember.AutoSize = True
-        chkRemember.Checked = True
-        chkRemember.CheckState = CheckState.Checked
-        chkRemember.Font = New Font("Segoe UI", 9.0F)
-        chkRemember.ForeColor = Color.FromArgb(CByte(100), CByte(116), CByte(139))
-        chkRemember.Location = New Point(55, 344)
-        chkRemember.Margin = New Padding(3, 4, 3, 4)
-        chkRemember.Name = "chkRemember"
-        chkRemember.Size = New Size(98, 24)
-        chkRemember.TabIndex = 8
-        chkRemember.Text = "Ingat saya"
-        chkRemember.UseVisualStyleBackColor = True
-        ' 
-        ' pnlPasswordUnderline
-        ' 
-        pnlPasswordUnderline.BackColor = Color.FromArgb(CByte(203), CByte(213), CByte(225))
-        pnlPasswordUnderline.Location = New Point(55, 320)
-        pnlPasswordUnderline.Margin = New Padding(3, 4, 3, 4)
-        pnlPasswordUnderline.Name = "pnlPasswordUnderline"
-        pnlPasswordUnderline.Size = New Size(443, 3)
-        pnlPasswordUnderline.TabIndex = 7
+        pnlPasswordInput.BackColor = Color.FromArgb(CByte(241), CByte(245), CByte(249))
+        pnlPasswordInput.Controls.Add(picTogglePassword)
+        pnlPasswordInput.Controls.Add(txtPassword)
+        pnlPasswordInput.Controls.Add(picLockIcon)
+        pnlPasswordInput.Cursor = Cursors.IBeam
+        pnlPasswordInput.Location = New Point(32, 212)
+        pnlPasswordInput.Name = "pnlPasswordInput"
+        pnlPasswordInput.Size = New Size(336, 42)
+        pnlPasswordInput.TabIndex = 5
         ' 
         ' txtPassword
         ' 
+        txtPassword.BackColor = Color.FromArgb(CByte(241), CByte(245), CByte(249))
         txtPassword.BorderStyle = BorderStyle.None
-        txtPassword.Font = New Font("Segoe UI", 10.5F)
+        txtPassword.Font = New Font("Segoe UI", 9.75F)
         txtPassword.ForeColor = Color.FromArgb(CByte(15), CByte(23), CByte(42))
-        txtPassword.Location = New Point(55, 285)
-        txtPassword.Margin = New Padding(3, 4, 3, 4)
+        txtPassword.Location = New Point(36, 11)
         txtPassword.Name = "txtPassword"
-        txtPassword.PasswordChar = "*"c
-        txtPassword.PlaceholderText = "Masukkan kata sandi..."
-        txtPassword.Size = New Size(443, 24)
-        txtPassword.TabIndex = 6
-        txtPassword.Text = "password123"
+        txtPassword.PlaceholderText = "Masukkan kata sandi"
+        txtPassword.Size = New Size(262, 22)
+        txtPassword.TabIndex = 1
+        txtPassword.UseSystemPasswordChar = True
+        ' 
+        ' picLockIcon
+        ' 
+        picLockIcon.Location = New Point(10, 11)
+        picLockIcon.Name = "picLockIcon"
+        picLockIcon.Size = New Size(20, 20)
+        picLockIcon.TabIndex = 0
+        picLockIcon.TabStop = False
         ' 
         ' lblPassword
         ' 
         lblPassword.AutoSize = True
-        lblPassword.Font = New Font("Segoe UI Semibold", 9.25F, FontStyle.Bold)
+        lblPassword.Font = New Font("Segoe UI Semibold", 8.5F, FontStyle.Bold)
         lblPassword.ForeColor = Color.FromArgb(CByte(51), CByte(65), CByte(85))
-        lblPassword.Location = New Point(53, 253)
+        lblPassword.Location = New Point(32, 188)
         lblPassword.Name = "lblPassword"
-        lblPassword.Size = New Size(86, 21)
-        lblPassword.TabIndex = 5
+        lblPassword.Size = New Size(81, 20)
+        lblPassword.TabIndex = 4
         lblPassword.Text = "Kata Sandi"
         ' 
-        ' pnlUsernameUnderline
+        ' pnlEmailInput
         ' 
-        pnlUsernameUnderline.BackColor = Color.FromArgb(CByte(203), CByte(213), CByte(225))
-        pnlUsernameUnderline.Location = New Point(55, 224)
-        pnlUsernameUnderline.Margin = New Padding(3, 4, 3, 4)
-        pnlUsernameUnderline.Name = "pnlUsernameUnderline"
-        pnlUsernameUnderline.Size = New Size(443, 3)
-        pnlUsernameUnderline.TabIndex = 4
+        pnlEmailInput.BackColor = Color.FromArgb(CByte(241), CByte(245), CByte(249))
+        pnlEmailInput.Controls.Add(txtEmail)
+        pnlEmailInput.Controls.Add(picMailIcon)
+        pnlEmailInput.Cursor = Cursors.IBeam
+        pnlEmailInput.Location = New Point(32, 134)
+        pnlEmailInput.Name = "pnlEmailInput"
+        pnlEmailInput.Size = New Size(336, 42)
+        pnlEmailInput.TabIndex = 3
         ' 
-        ' txtUsername
+        ' txtEmail
         ' 
-        txtUsername.BorderStyle = BorderStyle.None
-        txtUsername.Font = New Font("Segoe UI", 10.5F)
-        txtUsername.ForeColor = Color.FromArgb(CByte(15), CByte(23), CByte(42))
-        txtUsername.Location = New Point(55, 189)
-        txtUsername.Margin = New Padding(3, 4, 3, 4)
-        txtUsername.Name = "txtUsername"
-        txtUsername.PlaceholderText = "Masukkan NIM atau Username bebas..."
-        txtUsername.Size = New Size(443, 24)
-        txtUsername.TabIndex = 3
-        txtUsername.Text = "2207411001"
+        txtEmail.BackColor = Color.FromArgb(CByte(241), CByte(245), CByte(249))
+        txtEmail.BorderStyle = BorderStyle.None
+        txtEmail.Font = New Font("Segoe UI", 9.75F)
+        txtEmail.ForeColor = Color.FromArgb(CByte(15), CByte(23), CByte(42))
+        txtEmail.Location = New Point(36, 11)
+        txtEmail.Name = "txtEmail"
+        txtEmail.PlaceholderText = "nama@univ.ac.id atau NIP"
+        txtEmail.Size = New Size(290, 22)
+        txtEmail.TabIndex = 1
         ' 
-        ' lblUsername
+        ' lblEmail
         ' 
-        lblUsername.AutoSize = True
-        lblUsername.Font = New Font("Segoe UI Semibold", 9.25F, FontStyle.Bold)
-        lblUsername.ForeColor = Color.FromArgb(CByte(51), CByte(65), CByte(85))
-        lblUsername.Location = New Point(53, 157)
-        lblUsername.Name = "lblUsername"
-        lblUsername.Size = New Size(130, 21)
-        lblUsername.TabIndex = 2
-        lblUsername.Text = "NIM / Username"
+        lblEmail.AutoSize = True
+        lblEmail.Font = New Font("Segoe UI Semibold", 8.5F, FontStyle.Bold)
+        lblEmail.ForeColor = Color.FromArgb(CByte(51), CByte(65), CByte(85))
+        lblEmail.Location = New Point(32, 110)
+        lblEmail.Name = "lblEmail"
+        lblEmail.Size = New Size(185, 20)
+        lblEmail.TabIndex = 2
+        lblEmail.Text = "Email Institusi / NIP / NIM"
         ' 
-        ' lblLoginSub
+        ' lblSubtitle
         ' 
-        lblLoginSub.AutoSize = True
-        lblLoginSub.Font = New Font("Segoe UI", 9.25F)
-        lblLoginSub.ForeColor = Color.FromArgb(CByte(100), CByte(116), CByte(139))
-        lblLoginSub.Location = New Point(53, 97)
-        lblLoginSub.Name = "lblLoginSub"
-        lblLoginSub.Size = New Size(325, 21)
-        lblLoginSub.TabIndex = 1
-        lblLoginSub.Text = "Silakan masuk dengan akun mahasiswa Anda"
+        lblSubtitle.Font = New Font("Segoe UI", 9.25F)
+        lblSubtitle.ForeColor = Color.FromArgb(CByte(100), CByte(116), CByte(139))
+        lblSubtitle.Location = New Point(0, 68)
+        lblSubtitle.Name = "lblSubtitle"
+        lblSubtitle.Size = New Size(400, 24)
+        lblSubtitle.TabIndex = 1
+        lblSubtitle.Text = "Masuk ke Akun Portal Anda"
+        lblSubtitle.TextAlign = ContentAlignment.MiddleCenter
         ' 
-        ' lblLoginTitle
+        ' lblTitle
         ' 
-        lblLoginTitle.AutoSize = True
-        lblLoginTitle.Font = New Font("Segoe UI", 16.0F, FontStyle.Bold)
-        lblLoginTitle.ForeColor = Color.FromArgb(CByte(15), CByte(23), CByte(42))
-        lblLoginTitle.Location = New Point(50, 53)
-        lblLoginTitle.Name = "lblLoginTitle"
-        lblLoginTitle.Size = New Size(222, 37)
-        lblLoginTitle.TabIndex = 0
-        lblLoginTitle.Text = "Selamat Datang"
+        lblTitle.Font = New Font("Segoe UI", 18.0F, FontStyle.Bold)
+        lblTitle.ForeColor = Color.FromArgb(CByte(15), CByte(23), CByte(42))
+        lblTitle.Location = New Point(0, 32)
+        lblTitle.Name = "lblTitle"
+        lblTitle.Size = New Size(400, 35)
+        lblTitle.TabIndex = 0
+        lblTitle.Text = "EDOM"
+        lblTitle.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' picTogglePassword
+        ' 
+        picTogglePassword.Cursor = Cursors.Hand
+        picTogglePassword.Location = New Point(304, 11)
+        picTogglePassword.Name = "picTogglePassword"
+        picTogglePassword.Size = New Size(22, 20)
+        picTogglePassword.TabIndex = 2
+        picTogglePassword.TabStop = False
+        ' 
+        ' picMailIcon
+        ' 
+        picMailIcon.Location = New Point(10, 11)
+        picMailIcon.Name = "picMailIcon"
+        picMailIcon.Size = New Size(20, 20)
+        picMailIcon.TabIndex = 0
+        picMailIcon.TabStop = False
         ' 
         ' LoginForm
         ' 
+        AcceptButton = btnLogin
         AutoScaleDimensions = New SizeF(8.0F, 20.0F)
         AutoScaleMode = AutoScaleMode.Font
-        BackColor = Color.White
-        ClientSize = New Size(942, 693)
-        Controls.Add(pnlRight)
-        Controls.Add(pnlLeft)
+        BackColor = Color.FromArgb(CByte(248), CByte(250), CByte(252))
+        ClientSize = New Size(720, 560)
+        Controls.Add(pnlCard)
         Font = New Font("Segoe UI", 9.0F)
-        FormBorderStyle = FormBorderStyle.FixedDialog
-        Margin = New Padding(3, 4, 3, 4)
-        MaximizeBox = False
+        MinimumSize = New Size(480, 460)
         Name = "LoginForm"
         StartPosition = FormStartPosition.CenterScreen
-        Text = "Masuk - EDOM Portal (Politeknik Negeri Jakarta)"
-        pnlLeft.ResumeLayout(False)
-        pnlLeft.PerformLayout()
-        CType(picBrandLogo, ComponentModel.ISupportInitialize).EndInit()
-        pnlRight.ResumeLayout(False)
-        pnlRight.PerformLayout()
+        Text = "EDOM Portal - Masuk"
+        pnlCard.ResumeLayout(False)
+        pnlCard.PerformLayout()
+        pnlPasswordInput.ResumeLayout(False)
+        pnlPasswordInput.PerformLayout()
+        CType(picLockIcon, ComponentModel.ISupportInitialize).EndInit()
+        pnlEmailInput.ResumeLayout(False)
+        pnlEmailInput.PerformLayout()
+        CType(picTogglePassword, ComponentModel.ISupportInitialize).EndInit()
+        CType(picMailIcon, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
-
     End Sub
 
-End Class
+    Friend WithEvents picTogglePassword As PictureBox
+    Friend WithEvents picMailIcon As PictureBox
 
+End Class

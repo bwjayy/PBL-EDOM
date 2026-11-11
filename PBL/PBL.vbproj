@@ -19,11 +19,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="LoginForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Update="LoginForm.vb" />
     <Compile Update="LoginForm.Designer.vb">
       <DependentUpon>LoginForm.vb</DependentUpon>
+    </Compile>
+    <Compile Update="My Project\Resources.Designer.vb">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <EmbeddedResource Update="LoginForm.resx">
       <DependentUpon>LoginForm.vb</DependentUpon>
@@ -34,6 +37,11 @@
     </Compile>
     <EmbeddedResource Update="Form1.resx">
       <DependentUpon>Form1.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="My Project\Resources.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
     </EmbeddedResource>
     <Compile Update="My Project\Application.Designer.vb">
       <DesignTime>True</DesignTime>
