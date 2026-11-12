@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -15,6 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" />
+    <PackageReference Include="MySql.Data" Version="26.10.0" />
     <PackageReference Include="WinForms.DataVisualization" Version="1.10.2" />
   </ItemGroup>
 
@@ -22,6 +24,14 @@
     <Compile Update="LoginForm.vb" />
     <Compile Update="LoginForm.Designer.vb">
       <DependentUpon>LoginForm.vb</DependentUpon>
+    </Compile>
+    <Compile Update="DosenDashboardForm.vb" />
+    <Compile Update="DosenDashboardForm.Designer.vb">
+      <DependentUpon>DosenDashboardForm.vb</DependentUpon>
+    </Compile>
+    <Compile Update="AdminDashboardForm.vb" />
+    <Compile Update="AdminDashboardForm.Designer.vb">
+      <DependentUpon>AdminDashboardForm.vb</DependentUpon>
     </Compile>
     <Compile Update="My Project\Resources.Designer.vb">
       <DesignTime>True</DesignTime>

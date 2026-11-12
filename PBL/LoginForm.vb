@@ -1,5 +1,7 @@
+Imports System.Data
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
+Imports System.Linq
 Imports System.Windows.Forms
 
 Public Class LoginForm
@@ -178,9 +180,130 @@ Public Class LoginForm
     End Sub
 
     Private Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
-        Dim dashboard As New Form1()
-        dashboard.Show()
-        Me.Hide()
+        Dim inputEmail As String = txtEmail.Text.Trim()
+        Dim inputPassword As String = txtPassword.Text
+
+        If String.IsNullOrWhiteSpace(inputEmail) Then
+            MessageBox.Show("Silakan masukkan email kampus atau username Anda.", "Validasi Input", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            txtEmail.Focus()
+            Return
+        End If
+
+        If String.IsNullOrWhiteSpace(inputPassword) Then
+            MessageBox.Show("Silakan masukkan kata sandi Anda.", "Validasi Input", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            txtPassword.Focus()
+            Return
+        End If
+
+        btnLogin.Enabled = False
+        btnLogin.Text = "Memproses..."
+        Me.Cursor = Cursors.WaitCursor
+
+        Try
+            Dim params As New Dictionary(Of String, Object) From {
+                {"email", inputEmail}
+            }
+            Dim sql As String =
+                "SELECT u.id, u.study_program_id, u.name, u.email, u.password_hash, u.role, " &
+                "       sp.code AS prodi_code, sp.name AS prodi_name " &
+                "FROM users u " &
+                "LEFT JOIN study_programs sp ON u.study_program_id = sp.id " &
+                "WHERE u.email = @email OR u.name = @email"
+
+            Dim dt As DataTable = ModKoneksi.ExecuteQuery(sql, params)
+
+            If dt Is Nothing OrElse dt.Rows.Count = 0 Then
+                MessageBox.Show("Akun tidak ditemukan. Periksa kembali email atau username yang Anda masukkan.", "Gagal Masuk", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                txtEmail.Focus()
+                Return
+            End If
+
+            Dim userRow As DataRow = dt.Rows(0)
+            Dim storedHash As String = If(IsDBNull(userRow("password_hash")), "", userRow("password_hash").ToString())
+
+            If Not ModKoneksi.VerifyPassword(inputPassword, storedHash) Then
+                MessageBox.Show("Kata sandi yang Anda masukkan salah.", "Gagal Masuk", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                txtPassword.SelectAll()
+                txtPassword.Focus()
+                Return
+            End If
+
+            UserSession.Clear()
+            UserSession.UserId = Convert.ToInt64(userRow("id"))
+            UserSession.Nama = userRow("name").ToString()
+            UserSession.Email = userRow("email").ToString()
+            UserSession.Role = userRow("role").ToString().Trim().ToLower()
+            UserSession.StudyProgramId = If(IsDBNull(userRow("study_program_id")), 0, Convert.ToInt32(userRow("study_program_id")))
+            UserSession.NamaProdi = If(IsDBNull(userRow("prodi_name")), "Teknik Informatika", userRow("prodi_name").ToString())
+            UserSession.ProdiCode = If(IsDBNull(userRow("prodi_code")), "TI", userRow("prodi_code").ToString())
+
+            If UserSession.Role = "dosen" Then
+                Try
+                    Dim pDosen As New Dictionary(Of String, Object) From {{"userId", UserSession.UserId}}
+                    Dim dtDosen As DataTable = ModKoneksi.ExecuteQuery("SELECT nidn, gelar_depan, gelar_belakang FROM dosen_profiles WHERE user_id = @userId", pDosen)
+                    If dtDosen IsNot Nothing AndAlso dtDosen.Rows.Count > 0 Then
+                        Dim rD = dtDosen.Rows(0)
+                        UserSession.NIDN = If(IsDBNull(rD("nidn")), "", rD("nidn").ToString())
+                        UserSession.GelarDepan = If(IsDBNull(rD("gelar_depan")), "", rD("gelar_depan").ToString())
+                        UserSession.GelarBelakang = If(IsDBNull(rD("gelar_belakang")), "", rD("gelar_belakang").ToString())
+                    End If
+                Catch
+                End Try
+            ElseIf UserSession.Role = "mahasiswa" Then
+                Try
+                    Dim pMhs As New Dictionary(Of String, Object) From {{"userId", UserSession.UserId}}
+                    Dim dtMhs As DataTable = ModKoneksi.ExecuteQuery("SELECT nim, angkatan FROM mahasiswa_profiles WHERE user_id = @userId", pMhs)
+                    If dtMhs IsNot Nothing AndAlso dtMhs.Rows.Count > 0 Then
+                        Dim rM = dtMhs.Rows(0)
+                        UserSession.NIM = If(IsDBNull(rM("nim")), "", rM("nim").ToString())
+                        UserSession.Angkatan = If(IsDBNull(rM("angkatan")), 0, Convert.ToInt32(rM("angkatan")))
+                    End If
+                Catch
+                End Try
+            End If
+
+            Select Case UserSession.Role
+                Case "mahasiswa"
+                    Dim dashboardMahasiswa As New Form1()
+                    dashboardMahasiswa.Show()
+
+                Case "dosen"
+                    Dim dashboardDosen As New DosenDashboardForm()
+                    dashboardDosen.Show()
+
+                Case "admin"
+                    Dim dashboardAdmin As New AdminDashboardForm()
+                    dashboardAdmin.Show()
+
+                Case Else
+                    MessageBox.Show("Peran pengguna '" & UserSession.Role & "' tidak dikenali oleh sistem.", "Akses Ditolak", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return
+            End Select
+
+            txtPassword.Clear()
+            Me.Hide()
+
+        Catch ex As Exception
+            Dim pesan As String = "Terjadi kendala saat menghubungkan ke database server:" & vbCrLf & vbCrLf &
+                                  ex.Message & vbCrLf & vbCrLf &
+                                  "Tips Penanganan:" & vbCrLf &
+                                  "1. Pastikan database server (LocalDB atau MySQL XAMPP) sudah berjalan." & vbCrLf &
+                                  "2. Pastikan database 'edom_pbl' dan tabel-tabelnya sudah dibuat." & vbCrLf &
+                                  "3. Cek pengaturan host, port, user, dan password pada file 'ModKoneksi.vb'."
+            MessageBox.Show(pesan, "Gagal Koneksi Database", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            btnLogin.Enabled = True
+            btnLogin.Text = "Masuk"
+            Me.Cursor = Cursors.Default
+        End Try
+    End Sub
+
+    Private Sub LoginForm_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
+        If Application.OpenForms.OfType(Of Form1)().Count = 0 AndAlso
+           Application.OpenForms.OfType(Of DosenDashboardForm)().Count = 0 AndAlso
+           Application.OpenForms.OfType(Of AdminDashboardForm)().Count = 0 Then
+            Application.Exit()
+        End If
     End Sub
 
     Private Function GetRoundedPath(rect As Rectangle, radius As Integer) As GraphicsPath

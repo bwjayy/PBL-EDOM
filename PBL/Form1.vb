@@ -1,5 +1,6 @@
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
+Imports System.Linq
 Imports System.Windows.Forms
 
 Public Class Form1
@@ -20,6 +21,11 @@ Public Class Form1
     Private currentTab As String = "ALL"
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        If UserSession.IsLoggedIn Then
+            lblSidebarUserName.Text = UserSession.Nama
+            lblSidebarUserRole.Text = "Mahasiswa • " & If(String.IsNullOrWhiteSpace(UserSession.ProdiCode), "TI", UserSession.ProdiCode)
+        End If
+
         cboTahunAkademik.Items.AddRange(New Object() {"2026/2027 Ganjil", "2025/2026 Genap", "2025/2026 Ganjil"})
         cboTahunAkademik.SelectedIndex = 0
 
@@ -184,8 +190,9 @@ Public Class Form1
         Using brBg As New SolidBrush(colorNavy)
             e.Graphics.FillEllipse(brBg, rect)
         End Using
+        Dim initials As String = If(UserSession.IsLoggedIn, UserSession.GetInitials(), "BW")
         Using fontAvatar As New Font("Segoe UI Semibold", 9.0!, FontStyle.Bold), brText As New SolidBrush(Color.White)
-            e.Graphics.DrawString("BW", fontAvatar, brText, rect, New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center})
+            e.Graphics.DrawString(initials, fontAvatar, brText, rect, New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center})
         End Using
     End Sub
 
@@ -303,9 +310,21 @@ Public Class Form1
     End Sub
 
     Private Sub btnLogout_Click(sender As Object, e As EventArgs) Handles btnLogout.Click
-        Dim login As New LoginForm()
-        login.Show()
-        Me.Close()
+        Dim konfirmasi = MessageBox.Show("Apakah Anda yakin ingin keluar dari sistem?", "Konfirmasi Logout", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+        If konfirmasi = DialogResult.Yes Then
+            UserSession.Clear()
+            Dim login As New LoginForm()
+            login.Show()
+            Me.Close()
+        End If
+    End Sub
+
+    Private Sub Form1_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
+        If Application.OpenForms.OfType(Of LoginForm)().Count = 0 AndAlso
+           Application.OpenForms.OfType(Of DosenDashboardForm)().Count = 0 AndAlso
+           Application.OpenForms.OfType(Of AdminDashboardForm)().Count = 0 Then
+            Application.Exit()
+        End If
     End Sub
 
     Private Sub Form1_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize, pnlScrollBody.Resize

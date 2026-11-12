@@ -77,7 +77,7 @@ Partial Class LoginForm
         btnLogin.Name = "btnLogin"
         btnLogin.Size = New Size(336, 44)
         btnLogin.TabIndex = 6
-        btnLogin.Text = "➔   Masuk"
+        btnLogin.Text = "Masuk"
         btnLogin.UseVisualStyleBackColor = False
         ' 
         ' pnlPasswordInput
