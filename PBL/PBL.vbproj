@@ -33,6 +33,13 @@
     <Compile Update="AdminDashboardForm.Designer.vb">
       <DependentUpon>AdminDashboardForm.vb</DependentUpon>
     </Compile>
+    <Compile Update="KuisionerModalForm.vb" />
+    <Compile Update="KuisionerModalForm.Designer.vb">
+      <DependentUpon>KuisionerModalForm.vb</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="KuisionerModalForm.resx">
+      <DependentUpon>KuisionerModalForm.vb</DependentUpon>
+    </EmbeddedResource>
     <Compile Update="My Project\Resources.Designer.vb">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

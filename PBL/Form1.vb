@@ -40,6 +40,7 @@ Public Class Form1
         btnLogout.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnLogout.Width, btnLogout.Height), 6))
         btnTabAll.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnTabAll.Width, btnTabAll.Height), 6))
         btnTabPending.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnTabPending.Width, btnTabPending.Height), 6))
+        lblCountdownBadge.Region = New Region(GetRoundedPath(New Rectangle(0, 0, lblCountdownBadge.Width, lblCountdownBadge.Height), 6))
     End Sub
 
     Private Sub LoadStaticData()
@@ -66,6 +67,16 @@ Public Class Form1
         lblKpi1Value.Text = "10 Matakuliah"
         lblKpi2Value.Text = "0 / 10 Selesai (0%)"
         pnlProgressBarFill.Width = 0
+
+        ' Hitung sisa hari menuju batas pengisian
+        Dim deadline As New DateTime(2026, 12, 23)
+        Dim sisaHari As Integer = (deadline - DateTime.Today).Days
+        If sisaHari > 0 AndAlso sisaHari <= 90 Then
+            lblCountdownBadge.Text = "⏳ Sisa " & sisaHari.ToString() & " Hari Lagi"
+        Else
+            lblCountdownBadge.Text = "⏳ Sisa 23 Hari Lagi"
+        End If
+        lblCountdownBadge.Region = New Region(GetRoundedPath(New Rectangle(0, 0, lblCountdownBadge.Width, lblCountdownBadge.Height), 6))
     End Sub
 
     Private Sub SetupDataGridView()
@@ -121,13 +132,17 @@ Public Class Form1
             Dim text As String = e.Value.ToString()
             Dim pillRect As New Rectangle(e.CellBounds.X + (e.CellBounds.Width - 116) \ 2, e.CellBounds.Y + (e.CellBounds.Height - 26) \ 2, 116, 26)
 
+            Dim isSelesai As Boolean = text.Contains("Sudah Terisi")
+            Dim bgPill As Color = If(isSelesai, colorGreenBg, colorAmberBg)
+            Dim txtPill As Color = If(isSelesai, colorGreen, colorAmberText)
+
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
-            Using path As GraphicsPath = GetRoundedPath(pillRect, 13), brBg As New SolidBrush(colorAmberBg)
+            Using path As GraphicsPath = GetRoundedPath(pillRect, 13), brBg As New SolidBrush(bgPill)
                 e.Graphics.FillPath(brBg, path)
             End Using
 
             Using fontPill As New Font("Segoe UI Semibold", 8.5!, FontStyle.Bold),
-                  brText As New SolidBrush(colorAmberText),
+                  brText As New SolidBrush(txtPill),
                   sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
                 e.Graphics.DrawString(text, fontPill, brText, pillRect, sf)
             End Using
@@ -140,19 +155,78 @@ Public Class Form1
             e.PaintBackground(e.CellBounds, True)
             Dim btnRect As New Rectangle(e.CellBounds.X + (e.CellBounds.Width - 110) \ 2, e.CellBounds.Y + (e.CellBounds.Height - 30) \ 2, 110, 30)
 
+            Dim statusText As String = If(dgvEdom.Rows(e.RowIndex).Cells(3).Value IsNot Nothing, dgvEdom.Rows(e.RowIndex).Cells(3).Value.ToString(), "")
+            Dim isSelesai As Boolean = statusText.Contains("Sudah Terisi")
+
+            Dim btnBg As Color = If(isSelesai, Color.FromArgb(241, 245, 249), colorNavy)
+            Dim btnFore As Color = If(isSelesai, colorGreen, Color.White)
+            Dim btnText As String = If(isSelesai, "✓ Selesai", "Isi Kuisioner")
+
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
-            Using path As GraphicsPath = GetRoundedPath(btnRect, 6), brBg As New SolidBrush(colorNavy)
+            Using path As GraphicsPath = GetRoundedPath(btnRect, 6), brBg As New SolidBrush(btnBg)
                 e.Graphics.FillPath(brBg, path)
             End Using
 
             Using fontBtn As New Font("Segoe UI Semibold", 8.5!, FontStyle.Bold),
-                  brText As New SolidBrush(Color.White),
+                  brText As New SolidBrush(btnFore),
                   sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
-                e.Graphics.DrawString("Isi Kuisioner", fontBtn, brText, btnRect, sf)
+                e.Graphics.DrawString(btnText, fontBtn, brText, btnRect, sf)
             End Using
             e.Handled = True
             Return
         End If
+    End Sub
+
+    ' Klik tombol Isi Kuisioner membuka modal popup
+    Private Sub dgvEdom_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvEdom.CellClick
+        If e.RowIndex < 0 Then Return
+        If e.ColumnIndex = 4 Then
+            Dim row = dgvEdom.Rows(e.RowIndex)
+            Dim matkul = If(row.Cells(1).Value IsNot Nothing, row.Cells(1).Value.ToString(), "")
+            Dim dosen = If(row.Cells(2).Value IsNot Nothing, row.Cells(2).Value.ToString(), "")
+            Dim status = If(row.Cells(3).Value IsNot Nothing, row.Cells(3).Value.ToString(), "")
+
+            If status.Contains("Sudah Terisi") Then
+                MessageBox.Show("Kuisioner untuk mata kuliah ini sudah selesai diisi.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+
+            ' Tampilkan Modal Popup dengan Dimmed Backdrop
+            Using overlay As New Form()
+                overlay.StartPosition = FormStartPosition.Manual
+                overlay.FormBorderStyle = FormBorderStyle.None
+                overlay.Opacity = 0.5R
+                overlay.BackColor = Color.FromArgb(15, 23, 42)
+                overlay.ShowInTaskbar = False
+                overlay.Bounds = Me.Bounds
+
+                overlay.Show(Me)
+
+                Using popup As New KuisionerModalForm(matkul, dosen)
+                    If popup.ShowDialog(overlay) = DialogResult.OK Then
+                        row.Cells(3).Value = "• Sudah Terisi"
+                        UpdateProgressKpi()
+                        dgvEdom.InvalidateRow(e.RowIndex)
+                    End If
+                End Using
+
+                overlay.Close()
+            End Using
+        End If
+    End Sub
+
+    Private Sub UpdateProgressKpi()
+        Dim doneCount As Integer = 0
+        Dim totalCount As Integer = dgvEdom.Rows.Count
+        For Each r As DataGridViewRow In dgvEdom.Rows
+            Dim s = If(r.Cells(3).Value IsNot Nothing, r.Cells(3).Value.ToString(), "")
+            If s.Contains("Sudah Terisi") Then doneCount += 1
+        Next
+
+        Dim percent As Integer = If(totalCount > 0, CInt((doneCount / totalCount) * 100), 0)
+        lblKpi2Value.Text = doneCount.ToString() & " / " & totalCount.ToString() & " Selesai (" & percent.ToString() & "%)"
+        pnlProgressBarFill.Width = CInt((percent / 100.0!) * pnlProgressBarBg.Width)
+        btnTabPending.Text = "Belum Terisi (" & (totalCount - doneCount).ToString() & ")"
     End Sub
 
     Private Sub pnlSidebar_Paint(sender As Object, e As PaintEventArgs) Handles pnlSidebar.Paint
@@ -243,10 +317,16 @@ Public Class Form1
                     Dim boxRect As New Rectangle(badgeRect.X + 7, badgeRect.Y + 7, 15, 16)
                     g.DrawRectangle(penIcon, boxRect)
                     g.DrawArc(penIcon, badgeRect.X + 11, badgeRect.Y + 4, 7, 5, 180, 180)
-                Case 3 ' Calendar / Check
-                    Dim calRect As New Rectangle(badgeRect.X + 7, badgeRect.Y + 8, 15, 14)
-                    g.DrawRectangle(penIcon, calRect)
+                Case 3 ' Calendar with checkmark
+                    Dim calRect As New Rectangle(badgeRect.X + 7, badgeRect.Y + 9, 16, 13)
+                    Using path As GraphicsPath = GetRoundedPath(calRect, 2)
+                        g.DrawPath(penIcon, path)
+                    End Using
                     g.DrawLine(penIcon, calRect.X, calRect.Y + 4, calRect.Right, calRect.Y + 4)
+                    g.DrawLine(penIcon, calRect.X + 4, calRect.Y - 2, calRect.X + 4, calRect.Y)
+                    g.DrawLine(penIcon, calRect.Right - 4, calRect.Y - 2, calRect.Right - 4, calRect.Y)
+                    Dim pts() As Point = {New Point(calRect.X + 4, calRect.Y + 8), New Point(calRect.X + 7, calRect.Y + 11), New Point(calRect.Right - 4, calRect.Y + 6)}
+                    g.DrawLines(penIcon, pts)
             End Select
         End Using
     End Sub
@@ -303,8 +383,9 @@ Public Class Form1
         For Each row As DataGridViewRow In dgvEdom.Rows
             Dim matkul As String = If(row.Cells(1).Value IsNot Nothing, row.Cells(1).Value.ToString().ToLower(), "")
             Dim dosen As String = If(row.Cells(2).Value IsNot Nothing, row.Cells(2).Value.ToString().ToLower(), "")
+            Dim status As String = If(row.Cells(3).Value IsNot Nothing, row.Cells(3).Value.ToString(), "")
             Dim matchText As Boolean = String.IsNullOrEmpty(q) OrElse matkul.Contains(q) OrElse dosen.Contains(q)
-            Dim matchTab As Boolean = (currentTab = "ALL") OrElse (currentTab = "PENDING")
+            Dim matchTab As Boolean = (currentTab = "ALL") OrElse (currentTab = "PENDING" AndAlso status.Contains("Belum Terisi"))
             row.Visible = matchText AndAlso matchTab
         Next
     End Sub

@@ -20,7 +20,7 @@ Public Module ModKoneksi
 
     ' Konfigurasi MySQL (XAMPP / MariaDB di localhost)
     Public MySqlHost As String = "127.0.0.1"
-    Public MySqlPort As Integer = 3307 ' Port XAMPP terpasang (fallback otomatis ke 3306 jika diperlukan)
+    Public MySqlPort As Integer = 3306 ' Port XAMPP terpasang (fallback otomatis ke 3306 jika diperlukan)
     Public MySqlDatabase As String = "edom_pbl"
     Public MySqlUser As String = "root"
     Public MySqlPassword As String = ""

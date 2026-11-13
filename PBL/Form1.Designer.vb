@@ -58,6 +58,7 @@ Partial Class Form1
     Friend WithEvents cardDeadline As System.Windows.Forms.Panel
     Friend WithEvents lblKpi3Value As System.Windows.Forms.Label
     Friend WithEvents lblKpi3Title As System.Windows.Forms.Label
+    Friend WithEvents lblCountdownBadge As System.Windows.Forms.Label
 
     ' Alert Banner
     Friend WithEvents pnlAlert As System.Windows.Forms.Panel
@@ -103,6 +104,7 @@ Partial Class Form1
         cardDeadline = New Panel()
         lblKpi3Value = New Label()
         lblKpi3Title = New Label()
+        lblCountdownBadge = New Label()
         cardProgress = New Panel()
         pnlProgressBarBg = New Panel()
         pnlProgressBarFill = New Panel()
@@ -473,6 +475,7 @@ Partial Class Form1
         ' cardDeadline
         ' 
         cardDeadline.BackColor = Color.White
+        cardDeadline.Controls.Add(lblCountdownBadge)
         cardDeadline.Controls.Add(lblKpi3Value)
         cardDeadline.Controls.Add(lblKpi3Title)
         cardDeadline.Location = New Point(713, 0)
@@ -480,6 +483,20 @@ Partial Class Form1
         cardDeadline.Padding = New Padding(20, 18, 20, 18)
         cardDeadline.Size = New Size(334, 130)
         cardDeadline.TabIndex = 2
+        ' 
+        ' lblCountdownBadge
+        ' 
+        lblCountdownBadge.AutoSize = True
+        lblCountdownBadge.BackColor = Color.FromArgb(CByte(254), CByte(243), CByte(199))
+        lblCountdownBadge.Font = New Font("Segoe UI Semibold", 8.25F, FontStyle.Bold)
+        lblCountdownBadge.ForeColor = Color.FromArgb(CByte(146), CByte(64), CByte(14))
+        lblCountdownBadge.Location = New Point(18, 92)
+        lblCountdownBadge.Name = "lblCountdownBadge"
+        lblCountdownBadge.Padding = New Padding(8, 3, 8, 3)
+        lblCountdownBadge.Size = New Size(130, 25)
+        lblCountdownBadge.TabIndex = 2
+        lblCountdownBadge.Text = "⏳ Sisa 23 Hari Lagi"
+        lblCountdownBadge.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' lblKpi3Value
         ' 
