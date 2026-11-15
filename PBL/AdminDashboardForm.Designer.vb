@@ -24,6 +24,7 @@ Partial Class AdminDashboardForm
     Friend WithEvents pnlNavContainer As System.Windows.Forms.Panel
     Friend WithEvents lblNavHeader As System.Windows.Forms.Label
     Friend WithEvents btnNavDashboard As System.Windows.Forms.Button
+    Friend WithEvents btnNavManajemenAkun As System.Windows.Forms.Button
     Friend WithEvents pnlUserCard As System.Windows.Forms.Panel
     Friend WithEvents picUserAvatar As System.Windows.Forms.PictureBox
     Friend WithEvents lblSidebarUserName As System.Windows.Forms.Label
@@ -72,6 +73,36 @@ Partial Class AdminDashboardForm
     Friend WithEvents lblTableSub As System.Windows.Forms.Label
     Friend WithEvents dgvAdminData As System.Windows.Forms.DataGridView
 
+    ' Manajemen Akun View Controls
+    Friend WithEvents pnlContentAkun As System.Windows.Forms.Panel
+    Friend WithEvents pnlAkunKpiRow As System.Windows.Forms.Panel
+    Friend WithEvents cardAkunTotal As System.Windows.Forms.Panel
+    Friend WithEvents lblAkunTotalTitle As System.Windows.Forms.Label
+    Friend WithEvents lblAkunTotalValue As System.Windows.Forms.Label
+    Friend WithEvents lblAkunTotalSub As System.Windows.Forms.Label
+    Friend WithEvents cardAkunDosen As System.Windows.Forms.Panel
+    Friend WithEvents lblAkunDosenTitle As System.Windows.Forms.Label
+    Friend WithEvents lblAkunDosenValue As System.Windows.Forms.Label
+    Friend WithEvents lblAkunDosenSub As System.Windows.Forms.Label
+    Friend WithEvents cardAkunMhs As System.Windows.Forms.Panel
+    Friend WithEvents lblAkunMhsTitle As System.Windows.Forms.Label
+    Friend WithEvents lblAkunMhsValue As System.Windows.Forms.Label
+    Friend WithEvents lblAkunMhsSub As System.Windows.Forms.Label
+    Friend WithEvents pnlAkunTableCard As System.Windows.Forms.Panel
+    Friend WithEvents pnlAkunHeaderRow As System.Windows.Forms.Panel
+    Friend WithEvents lblAkunTableTitle As System.Windows.Forms.Label
+    Friend WithEvents lblAkunTableSub As System.Windows.Forms.Label
+    Friend WithEvents btnTambahAkun As System.Windows.Forms.Button
+    Friend WithEvents pnlAkunFilterToolbar As System.Windows.Forms.Panel
+    Friend WithEvents btnAkunTabAll As System.Windows.Forms.Button
+    Friend WithEvents btnAkunTabDosen As System.Windows.Forms.Button
+    Friend WithEvents btnAkunTabMahasiswa As System.Windows.Forms.Button
+    Friend WithEvents btnAkunTabNonaktif As System.Windows.Forms.Button
+    Friend WithEvents cmbAkunFilterProdi As System.Windows.Forms.ComboBox
+    Friend WithEvents pnlAkunSearchBox As System.Windows.Forms.Panel
+    Friend WithEvents txtAkunSearch As System.Windows.Forms.TextBox
+    Friend WithEvents dgvAkun As System.Windows.Forms.DataGridView
+
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim dataGridViewCellStyle1 As New System.Windows.Forms.DataGridViewCellStyle()
@@ -84,6 +115,7 @@ Partial Class AdminDashboardForm
         picUserAvatar = New System.Windows.Forms.PictureBox()
         pnlNavContainer = New System.Windows.Forms.Panel()
         btnNavDashboard = New System.Windows.Forms.Button()
+        btnNavManajemenAkun = New System.Windows.Forms.Button()
         lblNavHeader = New System.Windows.Forms.Label()
         pnlBrand = New System.Windows.Forms.Panel()
         lblSidebarSub = New System.Windows.Forms.Label()
@@ -212,6 +244,7 @@ Partial Class AdminDashboardForm
         '
         ' pnlNavContainer
         '
+        pnlNavContainer.Controls.Add(btnNavManajemenAkun)
         pnlNavContainer.Controls.Add(btnNavDashboard)
         pnlNavContainer.Controls.Add(lblNavHeader)
         pnlNavContainer.Dock = System.Windows.Forms.DockStyle.Fill
@@ -236,6 +269,22 @@ Partial Class AdminDashboardForm
         btnNavDashboard.Text = "Kelola Data Prodi"
         btnNavDashboard.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         btnNavDashboard.UseVisualStyleBackColor = False
+        '
+        ' btnNavManajemenAkun
+        '
+        btnNavManajemenAkun.BackColor = System.Drawing.Color.Transparent
+        btnNavManajemenAkun.Cursor = System.Windows.Forms.Cursors.Hand
+        btnNavManajemenAkun.FlatAppearance.BorderSize = 0
+        btnNavManajemenAkun.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        btnNavManajemenAkun.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0F, System.Drawing.FontStyle.Bold)
+        btnNavManajemenAkun.ForeColor = System.Drawing.Color.FromArgb(CByte(100), CByte(116), CByte(139))
+        btnNavManajemenAkun.Location = New System.Drawing.Point(16, 82)
+        btnNavManajemenAkun.Name = "btnNavManajemenAkun"
+        btnNavManajemenAkun.Size = New System.Drawing.Size(208, 38)
+        btnNavManajemenAkun.TabIndex = 2
+        btnNavManajemenAkun.Text = "Manajemen Akun"
+        btnNavManajemenAkun.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        btnNavManajemenAkun.UseVisualStyleBackColor = False
         '
         ' lblNavHeader
         '

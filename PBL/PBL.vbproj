@@ -40,6 +40,13 @@
     <EmbeddedResource Update="KuisionerModalForm.resx">
       <DependentUpon>KuisionerModalForm.vb</DependentUpon>
     </EmbeddedResource>
+    <Compile Update="AkunModalForm.vb" />
+    <Compile Update="AkunModalForm.Designer.vb">
+      <DependentUpon>AkunModalForm.vb</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="AkunModalForm.resx">
+      <DependentUpon>AkunModalForm.vb</DependentUpon>
+    </EmbeddedResource>
     <Compile Update="My Project\Resources.Designer.vb">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

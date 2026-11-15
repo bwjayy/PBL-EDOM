@@ -15,6 +15,7 @@ Public Class LoginForm
     Private passwordFocused As Boolean = False
 
     Private Sub LoginForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AkunRepository.EnsureInitialized()
         ApplyCardRegion()
         ApplyInputRegions()
         CenterCard()
@@ -204,7 +205,7 @@ Public Class LoginForm
                 {"email", inputEmail}
             }
             Dim sql As String =
-                "SELECT u.id, u.study_program_id, u.name, u.email, u.password_hash, u.role, " &
+                "SELECT u.*, " &
                 "       sp.code AS prodi_code, sp.name AS prodi_name " &
                 "FROM users u " &
                 "LEFT JOIN study_programs sp ON u.study_program_id = sp.id " &
@@ -225,6 +226,13 @@ Public Class LoginForm
                 MessageBox.Show("Kata sandi yang Anda masukkan salah.", "Gagal Masuk", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 txtPassword.SelectAll()
                 txtPassword.Focus()
+                Return
+            End If
+
+            ' Cek apakah akun dinonaktifkan (Soft Delete)
+            If dt.Columns.Contains("is_deleted") AndAlso Not IsDBNull(userRow("is_deleted")) AndAlso Convert.ToInt32(userRow("is_deleted")) = 1 Then
+                MessageBox.Show("Akun Anda telah dinonaktifkan oleh administrator. Silakan hubungi bagian administrasi.", "Akun Nonaktif", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                txtPassword.Clear()
                 Return
             End If
 
@@ -289,6 +297,47 @@ Public Class LoginForm
             Me.Hide()
 
         Catch ex As Exception
+            ' Fallback ke repository in-memory jika database server sedang offline
+            Dim fallbackUser = AkunRepository.AuthenticateOffline(inputEmail, inputPassword)
+            If fallbackUser IsNot Nothing Then
+                If fallbackUser.IsDeleted Then
+                    MessageBox.Show("Akun Anda telah dinonaktifkan oleh administrator. Silakan hubungi bagian administrasi.", "Akun Nonaktif", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    txtPassword.Clear()
+                    Return
+                End If
+
+                UserSession.Clear()
+                UserSession.UserId = fallbackUser.Id
+                UserSession.Nama = fallbackUser.Nama
+                UserSession.Email = fallbackUser.Email
+                UserSession.Role = fallbackUser.Role.ToLower()
+                UserSession.StudyProgramId = fallbackUser.ProdiId
+                UserSession.NamaProdi = fallbackUser.Prodi
+                UserSession.ProdiCode = If(fallbackUser.ProdiId = 1, "TI", If(fallbackUser.ProdiId = 2, "TMJ", If(fallbackUser.ProdiId = 3, "TMD", "RKS")))
+                UserSession.NIDN = fallbackUser.Nidn
+                UserSession.GelarDepan = fallbackUser.GelarDepan
+                UserSession.GelarBelakang = fallbackUser.GelarBelakang
+                UserSession.NIM = fallbackUser.Nim
+                UserSession.Angkatan = fallbackUser.Angkatan
+
+                If UserSession.Role = "admin" OrElse UserSession.Role = "superadmin" Then
+                    UserSession.NamaProdi = "Seluruh Jurusan"
+                    UserSession.ProdiCode = "ALL"
+                    Dim dashboardAdmin As New AdminDashboardForm()
+                    dashboardAdmin.Show()
+                ElseIf UserSession.Role = "dosen" Then
+                    Dim dashboardDosen As New DosenDashboardForm()
+                    dashboardDosen.Show()
+                Else
+                    Dim dashboardMahasiswa As New Form1()
+                    dashboardMahasiswa.Show()
+                End If
+
+                txtPassword.Clear()
+                Me.Hide()
+                Return
+            End If
+
             Dim pesan As String = "Terjadi kendala saat menghubungkan ke database server:" & vbCrLf & vbCrLf &
                                   ex.Message & vbCrLf & vbCrLf &
                                   "Tips Penanganan:" & vbCrLf &

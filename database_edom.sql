@@ -24,6 +24,7 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL,
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
     CONSTRAINT fk_users_study_programs FOREIGN KEY (study_program_id) REFERENCES study_programs(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -102,7 +103,8 @@ CREATE TABLE users (
     name VARCHAR(150) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    role VARCHAR(20) NOT NULL
+    role VARCHAR(20) NOT NULL,
+    is_deleted BIT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE dosen_profiles (
