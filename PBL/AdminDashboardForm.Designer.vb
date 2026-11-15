@@ -64,8 +64,8 @@ Partial Class AdminDashboardForm
     Friend WithEvents pnlTableToolbar As System.Windows.Forms.Panel
     Friend WithEvents btnTabDosen As System.Windows.Forms.Button
     Friend WithEvents btnTabMahasiswa As System.Windows.Forms.Button
-    Friend WithEvents cmbFilterProdi As System.Windows.Forms.ComboBox
     Friend WithEvents btnRefresh As System.Windows.Forms.Button
+    Friend WithEvents cmbFilterProdi As System.Windows.Forms.ComboBox
     Friend WithEvents pnlSearchBox As System.Windows.Forms.Panel
     Friend WithEvents txtSearch As System.Windows.Forms.TextBox
     Friend WithEvents lblSearchIcon As System.Windows.Forms.Label
@@ -128,12 +128,12 @@ Partial Class AdminDashboardForm
         dgvAdminData = New System.Windows.Forms.DataGridView()
         pnlTableToolbar = New System.Windows.Forms.Panel()
         btnRefresh = New System.Windows.Forms.Button()
+        cmbFilterProdi = New System.Windows.Forms.ComboBox()
         pnlSearchBox = New System.Windows.Forms.Panel()
         txtSearch = New System.Windows.Forms.TextBox()
         lblSearchIcon = New System.Windows.Forms.Label()
         btnTabMahasiswa = New System.Windows.Forms.Button()
         btnTabDosen = New System.Windows.Forms.Button()
-        cmbFilterProdi = New System.Windows.Forms.ComboBox()
         lblTableSub = New System.Windows.Forms.Label()
         lblTableTitle = New System.Windows.Forms.Label()
         pnlKpiRow = New System.Windows.Forms.Panel()
@@ -221,7 +221,7 @@ Partial Class AdminDashboardForm
         lblSidebarUserRole.Name = "lblSidebarUserRole"
         lblSidebarUserRole.Size = New System.Drawing.Size(162, 18)
         lblSidebarUserRole.TabIndex = 2
-        lblSidebarUserRole.Text = "admin"
+        lblSidebarUserRole.Text = "Admin Program Studi"
         '
         ' lblSidebarUserName
         '
@@ -232,7 +232,7 @@ Partial Class AdminDashboardForm
         lblSidebarUserName.Name = "lblSidebarUserName"
         lblSidebarUserName.Size = New System.Drawing.Size(162, 20)
         lblSidebarUserName.TabIndex = 1
-        lblSidebarUserName.Text = "Admin"
+        lblSidebarUserName.Text = "Nama Admin"
         '
         ' picUserAvatar
         '
@@ -419,8 +419,8 @@ Partial Class AdminDashboardForm
         ' pnlTableToolbar
         '
         pnlTableToolbar.Controls.Add(btnRefresh)
-        pnlTableToolbar.Controls.Add(pnlSearchBox)
         pnlTableToolbar.Controls.Add(cmbFilterProdi)
+        pnlTableToolbar.Controls.Add(pnlSearchBox)
         pnlTableToolbar.Controls.Add(btnTabMahasiswa)
         pnlTableToolbar.Controls.Add(btnTabDosen)
         pnlTableToolbar.Location = New System.Drawing.Point(20, 68)
@@ -440,9 +440,20 @@ Partial Class AdminDashboardForm
         btnRefresh.Location = New System.Drawing.Point(756, 4)
         btnRefresh.Name = "btnRefresh"
         btnRefresh.Size = New System.Drawing.Size(100, 32)
-        btnRefresh.TabIndex = 4
+        btnRefresh.TabIndex = 3
         btnRefresh.Text = "Perbarui Data"
         btnRefresh.UseVisualStyleBackColor = False
+        '
+        ' cmbFilterProdi
+        '
+        cmbFilterProdi.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        cmbFilterProdi.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        cmbFilterProdi.Font = New System.Drawing.Font("Segoe UI", 8.5F)
+        cmbFilterProdi.FormattingEnabled = True
+        cmbFilterProdi.Location = New System.Drawing.Point(294, 4)
+        cmbFilterProdi.Name = "cmbFilterProdi"
+        cmbFilterProdi.Size = New System.Drawing.Size(208, 23)
+        cmbFilterProdi.TabIndex = 4
         '
         ' pnlSearchBox
         '
@@ -450,21 +461,10 @@ Partial Class AdminDashboardForm
         pnlSearchBox.BackColor = System.Drawing.Color.FromArgb(CByte(248), CByte(250), CByte(252))
         pnlSearchBox.Controls.Add(txtSearch)
         pnlSearchBox.Controls.Add(lblSearchIcon)
-        pnlSearchBox.Location = New System.Drawing.Point(490, 4)
+        pnlSearchBox.Location = New System.Drawing.Point(510, 4)
         pnlSearchBox.Name = "pnlSearchBox"
-        pnlSearchBox.Size = New System.Drawing.Size(256, 32)
-        pnlSearchBox.TabIndex = 3
-        '
-        ' cmbFilterProdi
-        '
-        cmbFilterProdi.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        cmbFilterProdi.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        cmbFilterProdi.Font = New System.Drawing.Font("Segoe UI", 9.0F)
-        cmbFilterProdi.ForeColor = System.Drawing.Color.FromArgb(CByte(15), CByte(23), CByte(42))
-        cmbFilterProdi.Location = New System.Drawing.Point(296, 7)
-        cmbFilterProdi.Name = "cmbFilterProdi"
-        cmbFilterProdi.Size = New System.Drawing.Size(184, 25)
-        cmbFilterProdi.TabIndex = 2
+        pnlSearchBox.Size = New System.Drawing.Size(236, 32)
+        pnlSearchBox.TabIndex = 2
         '
         ' txtSearch
         '
@@ -516,7 +516,7 @@ Partial Class AdminDashboardForm
         btnTabDosen.Name = "btnTabDosen"
         btnTabDosen.Size = New System.Drawing.Size(138, 32)
         btnTabDosen.TabIndex = 0
-        btnTabDosen.Text = "Data Dosen"
+        btnTabDosen.Text = "Data Dosen Prodi"
         btnTabDosen.UseVisualStyleBackColor = False
         '
         ' lblTableSub
@@ -528,7 +528,7 @@ Partial Class AdminDashboardForm
         lblTableSub.Name = "lblTableSub"
         lblTableSub.Size = New System.Drawing.Size(357, 13)
         lblTableSub.TabIndex = 1
-        lblTableSub.Text = "Data sivitas akademika seluruh program studi pada sistem EDOM"
+        lblTableSub.Text = "Data sivitas akademika yang terafiliasi dengan program studi aktif"
         '
         ' lblTableTitle
         '
@@ -539,7 +539,7 @@ Partial Class AdminDashboardForm
         lblTableTitle.Name = "lblTableTitle"
         lblTableTitle.Size = New System.Drawing.Size(206, 20)
         lblTableTitle.TabIndex = 0
-        lblTableTitle.Text = "Daftar Pengguna Sistem EDOM"
+        lblTableTitle.Text = "Daftar Pengguna Prodi Aktif"
         '
         ' pnlKpiRow
         '
@@ -572,7 +572,7 @@ Partial Class AdminDashboardForm
         lblKpi3Sub.Name = "lblKpi3Sub"
         lblKpi3Sub.Size = New System.Drawing.Size(187, 13)
         lblKpi3Sub.TabIndex = 2
-        lblKpi3Sub.Text = "TI, TMJ, TMD, dan RKS"
+        lblKpi3Sub.Text = "Tersebar di semester 1, 3, dan 5"
         '
         ' lblKpi3Value
         '
@@ -583,7 +583,7 @@ Partial Class AdminDashboardForm
         lblKpi3Value.Name = "lblKpi3Value"
         lblKpi3Value.Size = New System.Drawing.Size(147, 32)
         lblKpi3Value.TabIndex = 1
-        lblKpi3Value.Text = "4 Program Studi"
+        lblKpi3Value.Text = "16 Kelas Aktif"
         '
         ' lblKpi3Title
         '
@@ -594,7 +594,7 @@ Partial Class AdminDashboardForm
         lblKpi3Title.Name = "lblKpi3Title"
         lblKpi3Title.Size = New System.Drawing.Size(126, 13)
         lblKpi3Title.TabIndex = 0
-        lblKpi3Title.Text = "CAKUPAN PROGRAM STUDI"
+        lblKpi3Title.Text = "TOTAL KELAS SEMESTER"
         '
         ' cardMhs
         '
@@ -617,7 +617,7 @@ Partial Class AdminDashboardForm
         lblKpi2Sub.Name = "lblKpi2Sub"
         lblKpi2Sub.Size = New System.Drawing.Size(184, 13)
         lblKpi2Sub.TabIndex = 2
-        lblKpi2Sub.Text = "Seluruh program studi aktif"
+        lblKpi2Sub.Text = "85% telah menyelesaikan EDOM"
         '
         ' lblKpi2Value
         '
@@ -628,7 +628,7 @@ Partial Class AdminDashboardForm
         lblKpi2Value.Name = "lblKpi2Value"
         lblKpi2Value.Size = New System.Drawing.Size(188, 32)
         lblKpi2Value.TabIndex = 1
-        lblKpi2Value.Text = "2 Mahasiswa"
+        lblKpi2Value.Text = "142 Mahasiswa"
         '
         ' lblKpi2Title
         '
@@ -639,7 +639,7 @@ Partial Class AdminDashboardForm
         lblKpi2Title.Name = "lblKpi2Title"
         lblKpi2Title.Size = New System.Drawing.Size(147, 13)
         lblKpi2Title.TabIndex = 0
-        lblKpi2Title.Text = "TOTAL MAHASISWA"
+        lblKpi2Title.Text = "MAHASISWA AKTIF PRODI"
         '
         ' cardDosen
         '
@@ -662,7 +662,7 @@ Partial Class AdminDashboardForm
         lblKpi1Sub.Name = "lblKpi1Sub"
         lblKpi1Sub.Size = New System.Drawing.Size(183, 13)
         lblKpi1Sub.TabIndex = 2
-        lblKpi1Sub.Text = "Seluruh program studi aktif"
+        lblKpi1Sub.Text = "Homebase prodi aktif semester ini"
         '
         ' lblKpi1Value
         '
@@ -673,7 +673,7 @@ Partial Class AdminDashboardForm
         lblKpi1Value.Name = "lblKpi1Value"
         lblKpi1Value.Size = New System.Drawing.Size(117, 32)
         lblKpi1Value.TabIndex = 1
-        lblKpi1Value.Text = "2 Dosen"
+        lblKpi1Value.Text = "18 Dosen"
         '
         ' lblKpi1Title
         '
@@ -684,7 +684,7 @@ Partial Class AdminDashboardForm
         lblKpi1Title.Name = "lblKpi1Title"
         lblKpi1Title.Size = New System.Drawing.Size(115, 13)
         lblKpi1Title.TabIndex = 0
-        lblKpi1Title.Text = "TOTAL DOSEN"
+        lblKpi1Title.Text = "TOTAL DOSEN PRODI"
         '
         ' pnlTopbar
         '
@@ -708,9 +708,8 @@ Partial Class AdminDashboardForm
         lblBadgeProdi.Name = "lblBadgeProdi"
         lblBadgeProdi.Size = New System.Drawing.Size(260, 32)
         lblBadgeProdi.TabIndex = 2
-        lblBadgeProdi.Text = "Akses: Super Admin (Global)"
+        lblBadgeProdi.Text = "Prodi: Teknik Informatika (TI)"
         lblBadgeProdi.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-        lblBadgeProdi.Visible = False
         '
         ' lblBreadcrumbSub
         '

@@ -368,6 +368,16 @@ Public Class KuisionerModalForm
 
     ' Validasi dan Kirim
     Private Sub btnKirim_Click(sender As Object, e As EventArgs) Handles btnKirim.Click
+        Try
+            If EdomLockService.IsLocked(UserSession.StudyProgramId) Then
+                MessageBox.Show("Periode pengisian EDOM telah dikunci oleh admin. Jawaban tidak dapat dikirim.", "EDOM Dikunci", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+        Catch
+            MessageBox.Show("Status EDOM tidak dapat diperiksa karena database tidak tersedia. Pengiriman dibatalkan.", "Status EDOM Tidak Tersedia", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return
+        End Try
+
         Dim missingCount As Integer = daftarSoal.Where(Function(s) s.Jawaban = 0).Count()
         If missingCount > 0 Then
             MessageBox.Show("Masih terdapat " & missingCount.ToString() & " pernyataan yang belum dinilai." & vbCrLf &

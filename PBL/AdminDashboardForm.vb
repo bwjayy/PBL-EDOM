@@ -17,6 +17,9 @@ Public Class AdminDashboardForm
     Private currentTab As String = "DOSEN" ' "DOSEN" atau "MAHASISWA"
     Private dtSource As DataTable = Nothing
     Private searchFocused As Boolean = False
+    Private lblEdomLockStatus As Label
+    Private lblEdomLockDescription As Label
+    Private btnEdomLock As Button
 
     ' State & Komponen Manajemen Akun
     Private currentMenu As String = "DASHBOARD" ' "DASHBOARD" atau "MANAJEMEN_AKUN"
@@ -30,10 +33,114 @@ Public Class AdminDashboardForm
 
         PopulateProdiFilter()
         InitManajemenAkunView()
+        SetupEdomLockControls()
+        RefreshEdomLockStatus()
         ApplyControlRegions()
         SwitchMenu("DASHBOARD")
         AturLayoutResponsif()
     End Sub
+
+    Private Sub SetupEdomLockControls()
+        Dim lockCard As New Panel With {
+            .Name = "pnlEdomLock", .BackColor = Color.White, .Left = 0, .Top = 132,
+            .Height = 72, .Width = pnlContent.Width - 1, .Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        }
+        lblEdomLockStatus = New Label With {
+            .AutoSize = False, .Location = New Point(18, 10), .Size = New Size(190, 22),
+            .Font = New Font("Segoe UI Semibold", 9.0!, FontStyle.Bold), .ForeColor = colorDark
+        }
+        lblEdomLockDescription = New Label With {
+            .AutoSize = False, .Location = New Point(18, 34), .Size = New Size(600, 24),
+            .Font = New Font("Segoe UI", 8.0!), .ForeColor = colorMuted
+        }
+        btnEdomLock = New Button With {
+            .Name = "btnEdomLock", .Text = "Kunci EDOM", .Size = New Size(138, 36),
+            .Anchor = AnchorStyles.Top Or AnchorStyles.Right, .FlatStyle = FlatStyle.Flat,
+            .BackColor = Color.FromArgb(185, 28, 28), .ForeColor = Color.White,
+            .Font = New Font("Segoe UI Semibold", 8.5!, FontStyle.Bold), .Cursor = Cursors.Hand
+        }
+        btnEdomLock.FlatAppearance.BorderSize = 0
+        AddHandler btnEdomLock.Click, AddressOf btnEdomLock_Click
+        lockCard.Controls.Add(lblEdomLockStatus)
+        lockCard.Controls.Add(lblEdomLockDescription)
+        lockCard.Controls.Add(btnEdomLock)
+        pnlContent.Controls.Add(lockCard)
+        lockCard.BringToFront()
+        btnEdomLock.Location = New Point(lockCard.Width - btnEdomLock.Width - 18, 18)
+        pnlTableCard.Top = 218
+        pnlContent.Height = Math.Max(pnlContent.Height, pnlTableCard.Bottom + 24)
+    End Sub
+
+    Private Sub RefreshEdomLockStatus()
+        Try
+            Dim studyProgramId = GetSelectedStudyProgramId()
+            If studyProgramId <= 0 Then
+                lblEdomLockStatus.Text = "Pilih program studi"
+                lblEdomLockStatus.ForeColor = colorMuted
+                lblEdomLockDescription.Text = "Pilih program studi pada filter untuk melihat atau mengubah status EDOM."
+                btnEdomLock.Enabled = False
+                Return
+            End If
+
+            Dim locked = EdomLockService.IsLocked(studyProgramId)
+            lblEdomLockStatus.Text = If(locked, "EDOM TERKUNCI", "EDOM TERBUKA")
+            lblEdomLockStatus.ForeColor = If(locked, Color.FromArgb(185, 28, 28), Color.FromArgb(5, 150, 105))
+            lblEdomLockDescription.Text = If(locked, "Mahasiswa tidak dapat mengisi atau mengirim evaluasi.", "Pengisian EDOM masih dibuka untuk mahasiswa prodi ini.")
+            btnEdomLock.Text = If(locked, "Buka Kembali", "Kunci EDOM")
+            btnEdomLock.BackColor = If(locked, colorNavy, Color.FromArgb(185, 28, 28))
+            btnEdomLock.Enabled = String.Equals(UserSession.Role, "admin", StringComparison.OrdinalIgnoreCase)
+        Catch ex As Exception
+            lblEdomLockStatus.Text = "Status EDOM tidak tersedia"
+            lblEdomLockDescription.Text = "Periksa koneksi database dan pastikan tabel edom_settings sudah dibuat."
+            btnEdomLock.Enabled = False
+        End Try
+    End Sub
+
+    Private Sub btnEdomLock_Click(sender As Object, e As EventArgs)
+        If Not String.Equals(UserSession.Role, "admin", StringComparison.OrdinalIgnoreCase) Then Return
+        Try
+            Dim studyProgramId = GetSelectedStudyProgramId()
+            If studyProgramId <= 0 Then
+                MessageBox.Show("Pilih satu program studi terlebih dahulu.", "Program Studi Belum Dipilih", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+
+            Dim currentlyLocked = EdomLockService.IsLocked(studyProgramId)
+            Dim nextLocked = Not currentlyLocked
+            Dim message = If(nextLocked,
+                "Kunci pengisian EDOM untuk seluruh mahasiswa program studi ini?",
+                "Buka kembali pengisian EDOM untuk mahasiswa program studi ini?")
+            If MessageBox.Show(message, "Konfirmasi Penguncian EDOM", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
+
+            EdomLockService.SetLocked(studyProgramId, nextLocked)
+            RefreshEdomLockStatus()
+            MessageBox.Show(If(nextLocked, "Pengisian EDOM berhasil dikunci.", "Pengisian EDOM berhasil dibuka kembali."), "Status EDOM", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Catch ex As Exception
+            MessageBox.Show("Status EDOM gagal diperbarui. Pastikan database dan tabel edom_settings tersedia." & vbCrLf & ex.Message,
+                            "Gagal Mengubah Status", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Function GetSelectedStudyProgramId() As Integer
+        If cmbFilterProdi.SelectedIndex <= 0 OrElse cmbFilterProdi.SelectedItem Is Nothing Then Return 0
+
+        Try
+            Dim parameters As New Dictionary(Of String, Object) From {
+                {"name", cmbFilterProdi.SelectedItem.ToString()}
+            }
+            Dim result = ModKoneksi.ExecuteScalar("SELECT id FROM study_programs WHERE name = @name", parameters)
+            If result IsNot Nothing AndAlso result IsNot DBNull.Value Then Return Convert.ToInt32(result)
+        Catch
+        End Try
+
+        Select Case cmbFilterProdi.SelectedItem.ToString().Trim().ToLower()
+            Case "teknik informatika" : Return 1
+            Case "teknik multimedia dan jaringan" : Return 2
+            Case "teknik multimedia digital" : Return 3
+            Case "rekayasa keamanan siber" : Return 4
+            Case Else : Return 0
+        End Select
+    End Function
 
     Private Sub PopulateProdiFilter()
         cmbFilterProdi.Items.Clear()
@@ -183,7 +290,7 @@ Public Class AdminDashboardForm
                 "FROM users u " &
                 "INNER JOIN dosen_profiles dp ON u.id = dp.user_id " &
                 "LEFT JOIN study_programs sp ON u.study_program_id = sp.id " &
-                "WHERE u.role = 'dosen' " &
+                "WHERE u.role = 'dosen' AND COALESCE(u.is_deleted, 0) = 0 " &
                 "ORDER BY u.name ASC"
 
             Dim dt As DataTable = ModKoneksi.ExecuteQuery(sql)
@@ -244,7 +351,7 @@ Public Class AdminDashboardForm
                 "FROM users u " &
                 "INNER JOIN mahasiswa_profiles mp ON u.id = mp.user_id " &
                 "LEFT JOIN study_programs sp ON u.study_program_id = sp.id " &
-                "WHERE u.role = 'mahasiswa' " &
+                "WHERE u.role = 'mahasiswa' AND COALESCE(u.is_deleted, 0) = 0 " &
                 "ORDER BY u.name ASC"
 
             Dim dt As DataTable = ModKoneksi.ExecuteQuery(sql)
@@ -283,6 +390,7 @@ Public Class AdminDashboardForm
 
     ' Filter Pencarian & Program Studi
     Private Sub FilterData()
+        dgvAdminData.CurrentCell = Nothing
         Dim q As String = txtSearch.Text.Trim().ToLower()
         Dim selectedProdi As String = ""
         If cmbFilterProdi IsNot Nothing AndAlso cmbFilterProdi.SelectedIndex > 0 Then
@@ -318,6 +426,7 @@ Public Class AdminDashboardForm
 
     Private Sub cmbFilterProdi_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbFilterProdi.SelectedIndexChanged
         FilterData()
+        If btnEdomLock IsNot Nothing Then RefreshEdomLockStatus()
     End Sub
 
     Private Sub btnTabDosen_Click(sender As Object, e As EventArgs) Handles btnTabDosen.Click
@@ -431,6 +540,12 @@ Public Class AdminDashboardForm
         pnlTableCard.Width = w
         pnlTableToolbar.Width = w - 40
         dgvAdminData.Width = w - 40
+
+        Dim lockCard = pnlContent.Controls("pnlEdomLock")
+        If lockCard IsNot Nothing Then
+            lockCard.Width = w
+            btnEdomLock.Left = lockCard.ClientSize.Width - btnEdomLock.Width - 18
+        End If
 
         If pnlContentAkun IsNot Nothing Then
             pnlContentAkun.Left = 32
@@ -751,6 +866,7 @@ Public Class AdminDashboardForm
 
     Private Sub FilterAkunData()
         If dgvAkun Is Nothing Then Return
+        dgvAkun.CurrentCell = Nothing
         Dim q As String = If(txtAkunSearch IsNot Nothing, txtAkunSearch.Text.Trim().ToLower(), "")
         Dim selectedProdi As String = ""
         If cmbAkunFilterProdi IsNot Nothing AndAlso cmbAkunFilterProdi.SelectedIndex > 0 Then

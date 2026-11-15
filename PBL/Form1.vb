@@ -19,6 +19,7 @@ Public Class Form1
     Private ReadOnly colorBlueBg As Color = Color.FromArgb(239, 246, 255)
 
     Private currentTab As String = "ALL"
+    Private edomLocked As Boolean = False
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If UserSession.IsLoggedIn Then
@@ -31,8 +32,25 @@ Public Class Form1
 
         SetupDataGridView()
         LoadStaticData()
+        RefreshEdomLockStatus()
         ApplyControlRegions()
         AturLayoutResponsif()
+    End Sub
+
+    Private Sub RefreshEdomLockStatus()
+        Try
+            edomLocked = EdomLockService.IsLocked(UserSession.StudyProgramId)
+        Catch
+            ' Jika status tidak dapat dipastikan, blok pengisian agar penutupan periode tetap aman.
+            edomLocked = True
+        End Try
+        If edomLocked Then
+            lblCountdownBadge.Text = "EDOM Dikunci Admin"
+            lblCountdownBadge.BackColor = Color.FromArgb(254, 226, 226)
+            lblCountdownBadge.ForeColor = Color.FromArgb(185, 28, 28)
+            lblCountdownBadge.Region = New Region(GetRoundedPath(New Rectangle(0, 0, lblCountdownBadge.Width, lblCountdownBadge.Height), 6))
+            dgvEdom.Invalidate()
+        End If
     End Sub
 
     Private Sub ApplyControlRegions()
@@ -169,9 +187,9 @@ Public Class Form1
             Dim statusText As String = If(dgvEdom.Rows(e.RowIndex).Cells(3).Value IsNot Nothing, dgvEdom.Rows(e.RowIndex).Cells(3).Value.ToString(), "")
             Dim isSelesai As Boolean = statusText.Contains("Sudah Terisi")
 
-            Dim btnBg As Color = If(isSelesai, Color.FromArgb(241, 245, 249), colorNavy)
-            Dim btnFore As Color = If(isSelesai, colorGreen, Color.White)
-            Dim btnText As String = If(isSelesai, "✓ Selesai", "Isi Kuisioner")
+            Dim btnBg As Color = If(isSelesai, Color.FromArgb(241, 245, 249), If(edomLocked, Color.FromArgb(226, 232, 240), colorNavy))
+            Dim btnFore As Color = If(isSelesai, colorGreen, If(edomLocked, colorMuted, Color.White))
+            Dim btnText As String = If(isSelesai, "✓ Selesai", If(edomLocked, "EDOM Dikunci", "Isi Kuisioner"))
 
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
             Using path As GraphicsPath = GetRoundedPath(btnRect, 6), brBg As New SolidBrush(btnBg)
@@ -192,10 +210,16 @@ Public Class Form1
     Private Sub dgvEdom_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvEdom.CellClick
         If e.RowIndex < 0 Then Return
         If e.ColumnIndex = 4 Then
+            RefreshEdomLockStatus()
             Dim row = dgvEdom.Rows(e.RowIndex)
             Dim matkul = If(row.Cells(1).Value IsNot Nothing, row.Cells(1).Value.ToString(), "")
             Dim dosen = If(row.Cells(2).Value IsNot Nothing, row.Cells(2).Value.ToString(), "")
             Dim status = If(row.Cells(3).Value IsNot Nothing, row.Cells(3).Value.ToString(), "")
+
+            If edomLocked Then
+                MessageBox.Show("Periode pengisian EDOM telah dikunci oleh admin program studi.", "EDOM Dikunci", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
 
             If status.Contains("Sudah Terisi") Then
                 MessageBox.Show("Kuisioner untuk mata kuliah ini sudah selesai diisi.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -390,6 +414,7 @@ Public Class Form1
     End Sub
 
     Private Sub ApplyFilter()
+        dgvEdom.CurrentCell = Nothing
         Dim q As String = txtSearch.Text.Trim().ToLower()
         For Each row As DataGridViewRow In dgvEdom.Rows
             Dim matkul As String = If(row.Cells(1).Value IsNot Nothing, row.Cells(1).Value.ToString().ToLower(), "")

@@ -16,6 +16,8 @@ Aplikasi Desktop berbasis **Visual Basic .NET (.NET 8 Windows Forms)** untuk pen
 ##  Cara Menjalankan Proyek
 
 ### 1. Setup Database (XAMPP / MySQL)
+Jika database sudah berisi data, jangan impor ulang skrip setup karena skrip tersebut membuat ulang tabel. Jalankan `edom_lock_migration.sql` sekali pada database `edom_pbl` untuk menambahkan pengaturan kunci EDOM tanpa menghapus data.
+
 1. Buka **XAMPP Control Panel** dan jalankan modul **MySQL** (dan Apache jika memakai phpMyAdmin).
 2. Buka **phpMyAdmin** di browser (`http://localhost/phpmyadmin`).
 3. Pilih menu **Import**, lalu pilih berkas `config.sql` yang ada di direktori utama repositori ini.
