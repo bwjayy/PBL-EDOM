@@ -49,10 +49,8 @@ CREATE TABLE mahasiswa_profiles (
 CREATE TABLE edom_settings (
     study_program_id INT PRIMARY KEY,
     is_locked TINYINT(1) NOT NULL DEFAULT 0,
-    updated_by BIGINT NULL,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_edom_settings_program FOREIGN KEY (study_program_id) REFERENCES study_programs(id) ON DELETE CASCADE,
-    CONSTRAINT fk_edom_settings_admin FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+    CONSTRAINT fk_edom_settings_program FOREIGN KEY (study_program_id) REFERENCES study_programs(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Data Master Program Studi
@@ -134,7 +132,6 @@ CREATE TABLE mahasiswa_profiles (
 CREATE TABLE edom_settings (
     study_program_id INT PRIMARY KEY FOREIGN KEY REFERENCES study_programs(id) ON DELETE CASCADE,
     is_locked BIT NOT NULL DEFAULT 0,
-    updated_by BIGINT NULL FOREIGN KEY REFERENCES users(id) ON DELETE SET NULL,
     updated_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 GO

@@ -18,15 +18,14 @@ Public Module EdomLockService
 
         Dim parameters As New Dictionary(Of String, Object) From {
             {"studyProgramId", studyProgramId},
-            {"isLocked", If(locked, 1, 0)},
-            {"updatedBy", If(UserSession.UserId > 0, CType(UserSession.UserId, Object), DBNull.Value)}
+            {"isLocked", If(locked, 1, 0)}
         }
 
         Dim changed As Integer = ModKoneksi.ExecuteNonQuery(
-            "UPDATE edom_settings SET is_locked = @isLocked, updated_by = @updatedBy, updated_at = CURRENT_TIMESTAMP WHERE study_program_id = @studyProgramId", parameters)
+            "UPDATE edom_settings SET is_locked = @isLocked, updated_at = CURRENT_TIMESTAMP WHERE study_program_id = @studyProgramId", parameters)
         If changed = 0 Then
             ModKoneksi.ExecuteNonQuery(
-                "INSERT INTO edom_settings (study_program_id, is_locked, updated_by) VALUES (@studyProgramId, @isLocked, @updatedBy)", parameters)
+                "INSERT INTO edom_settings (study_program_id, is_locked) VALUES (@studyProgramId, @isLocked)", parameters)
         End If
     End Sub
 End Module
