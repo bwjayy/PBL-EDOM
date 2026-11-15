@@ -64,6 +64,7 @@ Partial Class AdminDashboardForm
     Friend WithEvents btnTabDosen As System.Windows.Forms.Button
     Friend WithEvents btnTabMahasiswa As System.Windows.Forms.Button
     Friend WithEvents btnRefresh As System.Windows.Forms.Button
+    Friend WithEvents cmbFilterProdi As System.Windows.Forms.ComboBox
     Friend WithEvents pnlSearchBox As System.Windows.Forms.Panel
     Friend WithEvents txtSearch As System.Windows.Forms.TextBox
     Friend WithEvents lblSearchIcon As System.Windows.Forms.Label
@@ -95,6 +96,7 @@ Partial Class AdminDashboardForm
         dgvAdminData = New System.Windows.Forms.DataGridView()
         pnlTableToolbar = New System.Windows.Forms.Panel()
         btnRefresh = New System.Windows.Forms.Button()
+        cmbFilterProdi = New System.Windows.Forms.ComboBox()
         pnlSearchBox = New System.Windows.Forms.Panel()
         txtSearch = New System.Windows.Forms.TextBox()
         lblSearchIcon = New System.Windows.Forms.Label()
@@ -368,6 +370,7 @@ Partial Class AdminDashboardForm
         ' pnlTableToolbar
         '
         pnlTableToolbar.Controls.Add(btnRefresh)
+        pnlTableToolbar.Controls.Add(cmbFilterProdi)
         pnlTableToolbar.Controls.Add(pnlSearchBox)
         pnlTableToolbar.Controls.Add(btnTabMahasiswa)
         pnlTableToolbar.Controls.Add(btnTabDosen)
@@ -391,6 +394,17 @@ Partial Class AdminDashboardForm
         btnRefresh.TabIndex = 3
         btnRefresh.Text = "Perbarui Data"
         btnRefresh.UseVisualStyleBackColor = False
+        '
+        ' cmbFilterProdi
+        '
+        cmbFilterProdi.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        cmbFilterProdi.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        cmbFilterProdi.Font = New System.Drawing.Font("Segoe UI", 8.5F)
+        cmbFilterProdi.FormattingEnabled = True
+        cmbFilterProdi.Location = New System.Drawing.Point(294, 4)
+        cmbFilterProdi.Name = "cmbFilterProdi"
+        cmbFilterProdi.Size = New System.Drawing.Size(208, 23)
+        cmbFilterProdi.TabIndex = 4
         '
         ' pnlSearchBox
         '

@@ -61,21 +61,27 @@ INSERT INTO study_programs (id, code, name) VALUES
 (3, 'TMD', 'Teknik Multimedia Digital'),
 (4, 'RKS', 'Rekayasa Keamanan Siber');
 
--- Data Akun Pengujian (3 Role: Admin, Dosen, Mahasiswa)
--- Akun 1: Admin TI     - Email: admin.ti@pnj.ac.id        - Sandi: admin123
--- Akun 2: Dosen TI     - Email: bambang.warsuta@pnj.ac.id  - Sandi: dosen123
--- Akun 3: Mahasiswa TI - Email: rahmat.ti@pnj.ac.id       - Sandi: mhs123
+-- Data Akun Pengujian (Role: Super Admin, Dosen, Mahasiswa)
+-- Admin:        admin@pnj.ac.id            | Kata Sandi: admin123
+-- Dosen TI:      bambang.warsuta@pnj.ac.id  | Kata Sandi: dosen123
+-- Mahasiswa TI:  rahmat.ti@pnj.ac.id        | Kata Sandi: mhs123
+-- Dosen TMJ:     anita.hidayati@pnj.ac.id   | Kata Sandi: dosen123
+-- Mahasiswa TMJ: ahmad.fauzi@pnj.ac.id      | Kata Sandi: mhs123
 
 INSERT INTO users (id, study_program_id, name, email, password_hash, role) VALUES
-(1, 1, 'Admin TI PNJ', 'admin.ti@pnj.ac.id', 'admin123', 'admin'),
+(1, NULL, 'Admin', 'admin@pnj.ac.id', 'admin123', 'admin'),
 (2, 1, 'Bambang Warsuta', 'bambang.warsuta@pnj.ac.id', 'dosen123', 'dosen'),
-(3, 1, 'Muhammad Rahmat', 'rahmat.ti@pnj.ac.id', 'mhs123', 'mahasiswa');
+(3, 1, 'Muhammad Rahmat', 'rahmat.ti@pnj.ac.id', 'mhs123', 'mahasiswa'),
+(4, 2, 'Anita Hidayati', 'anita.hidayati@pnj.ac.id', 'dosen123', 'dosen'),
+(5, 2, 'Ahmad Fauzi', 'ahmad.fauzi@pnj.ac.id', 'mhs123', 'mahasiswa');
 
 INSERT INTO dosen_profiles (user_id, nidn, gelar_depan, gelar_belakang) VALUES
-(2, '0012057801', 'Dr.', 'S.Kom., M.T.');
+(2, '0012057801', 'Dr.', 'S.Kom., M.T.'),
+(4, '0014088202', '', 'S.Kom., M.Kom.');
 
 INSERT INTO mahasiswa_profiles (user_id, nim, angkatan) VALUES
-(3, '2207421035', 2022);
+(3, '2207421035', 2022),
+(5, '2207421001', 2022);
 
 -- Alternatif: Skrip Microsoft SQL Server (T-SQL / SSMS)
 /*
