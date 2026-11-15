@@ -1,0 +1,61 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="5F9A876F-3178-DCE5-7329-791C774FD80B" name="F_SHIFTS">
+<createdBy>USER</createdBy>
+<createdTime>2026-09-02 04:20:01 UTC</createdTime>
+<ownerDesignName>basdat</ownerDesignName>
+<ordsAlias>table_1</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="code" id="15CA75E7-B559-9F0D-9848-526E39160D76">
+<createdBy>USER</createdBy>
+<createdTime>2026-09-02 04:24:42 UTC</createdTime>
+<ownerDesignName>basdat</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="F_SHIFTS" id="321AF75C-88C8-5682-43E4-7C88005C938C">
+<createdBy>USER</createdBy>
+<createdTime>2026-09-02 04:26:40 UTC</createdTime>
+<ownerDesignName>basdat</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="shift_code" id="A5109A22-92D6-1747-A228-F0CD0F85E88D">
+<createdBy>USER</createdBy>
+<createdTime>2026-09-02 04:26:40 UTC</createdTime>
+<ownerDesignName>basdat</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="F_STAFFS" id="BD8D1B7C-8710-601A-4D7E-2BEB5F826226">
+<createdBy>USER</createdBy>
+<createdTime>2026-09-02 04:26:40 UTC</createdTime>
+<ownerDesignName>basdat</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="91E1DE8C-C4BD-F1EB-EF63-5624F32C16A4" name="F_SHIFTS_PK">
+<createdBy>USER</createdBy>
+<createdTime>2026-09-02 04:26:40 UTC</createdTime>
+<ownerDesignName>basdat</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="321AF75C-88C8-5682-43E4-7C88005C938C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
