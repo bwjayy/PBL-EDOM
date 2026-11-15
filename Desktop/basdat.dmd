@@ -1,8 +1,0 @@
-<?xml version = '1.0' encoding = 'UTF-8'?>
-<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="basdat" id="88FDD452-60E6-049E-68CC-644684F1E11F" version="3.5">
-<createdBy>USER</createdBy>
-<createdTime>2026-09-02 04:15:18 UTC</createdTime>
-<ownerDesignName>basdat</ownerDesignName>
-<capitalNames>false</capitalNames>
-<designId>88FDD452-60E6-049E-68CC-644684F1E11F</designId>
-</OSDM_Design>
