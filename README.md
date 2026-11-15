@@ -33,7 +33,7 @@ Jika database sudah berisi data, jangan impor ulang skrip setup karena skrip ter
 ### 3. Akun Pengujian (Testing Accounts)
 | Peran (Role) | Email / Username | Kata Sandi | Halaman |
 | :--- | :--- | :--- | :--- |
-| **Admin** | `admin@pnj.ac.id` | `admin123` | Dashboard Admin |
+| **Admin Prodi** | `admin.ti@pnj.ac.id` | `admin123` | Dashboard Admin Prodi |
 | **Dosen** | `bambang.warsuta@pnj.ac.id` | `dosen123` | Dashboard Dosen |
 | **Mahasiswa** | `rahmat.ti@pnj.ac.id` | `mhs123` | Dashboard Mahasiswa |
 

@@ -69,16 +69,7 @@ Public Class AdminDashboardForm
 
     Private Sub RefreshEdomLockStatus()
         Try
-            Dim studyProgramId = GetSelectedStudyProgramId()
-            If studyProgramId <= 0 Then
-                lblEdomLockStatus.Text = "Pilih program studi"
-                lblEdomLockStatus.ForeColor = colorMuted
-                lblEdomLockDescription.Text = "Pilih program studi pada filter untuk melihat atau mengubah status EDOM."
-                btnEdomLock.Enabled = False
-                Return
-            End If
-
-            Dim locked = EdomLockService.IsLocked(studyProgramId)
+            Dim locked = EdomLockService.IsLocked(UserSession.StudyProgramId)
             lblEdomLockStatus.Text = If(locked, "EDOM TERKUNCI", "EDOM TERBUKA")
             lblEdomLockStatus.ForeColor = If(locked, Color.FromArgb(185, 28, 28), Color.FromArgb(5, 150, 105))
             lblEdomLockDescription.Text = If(locked, "Mahasiswa tidak dapat mengisi atau mengirim evaluasi.", "Pengisian EDOM masih dibuka untuk mahasiswa prodi ini.")
@@ -95,39 +86,20 @@ Public Class AdminDashboardForm
     Private Sub btnEdomLock_Click(sender As Object, e As EventArgs)
         If Not String.Equals(UserSession.Role, "admin", StringComparison.OrdinalIgnoreCase) Then Return
         Try
-            Dim studyProgramId = GetSelectedStudyProgramId()
-            If studyProgramId <= 0 Then
-                MessageBox.Show("Pilih satu program studi terlebih dahulu.", "Program Studi Belum Dipilih", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                Return
-            End If
-
-            Dim currentlyLocked = EdomLockService.IsLocked(studyProgramId)
+            Dim currentlyLocked = EdomLockService.IsLocked(UserSession.StudyProgramId)
             Dim nextLocked = Not currentlyLocked
             Dim message = If(nextLocked,
                 "Kunci pengisian EDOM untuk seluruh mahasiswa program studi ini?",
                 "Buka kembali pengisian EDOM untuk mahasiswa program studi ini?")
             If MessageBox.Show(message, "Konfirmasi Penguncian EDOM", MessageBoxButtons.YesNo, MessageBoxIcon.Question) <> DialogResult.Yes Then Return
 
-            EdomLockService.SetLocked(studyProgramId, nextLocked)
+            EdomLockService.SetLocked(UserSession.StudyProgramId, nextLocked)
             RefreshEdomLockStatus()
             MessageBox.Show(If(nextLocked, "Pengisian EDOM berhasil dikunci.", "Pengisian EDOM berhasil dibuka kembali."), "Status EDOM", MessageBoxButtons.OK, MessageBoxIcon.Information)
         Catch ex As Exception
             MessageBox.Show("Status EDOM gagal diperbarui. Pastikan database dan tabel edom_settings tersedia." & vbCrLf & ex.Message,
                             "Gagal Mengubah Status", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
-    End Sub
-
-    Private Function GetSelectedStudyProgramId() As Integer
-        If cmbFilterProdi.SelectedIndex <= 0 OrElse cmbFilterProdi.SelectedItem Is Nothing Then Return 0
-
-        Dim parameters As New Dictionary(Of String, Object) From {
-            {"name", cmbFilterProdi.SelectedItem.ToString()}
-        }
-        Dim result = ModKoneksi.ExecuteScalar("SELECT id FROM study_programs WHERE name = @name", parameters)
-        If result Is Nothing OrElse result Is DBNull.Value Then Return 0
-        Return Convert.ToInt32(result)
-    End Function
-
     Private Sub PopulateProdiFilter()
         cmbFilterProdi.Items.Clear()
         cmbFilterProdi.Items.Add("Semua Program Studi")
@@ -356,7 +328,6 @@ Public Class AdminDashboardForm
 
     Private Sub cmbFilterProdi_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbFilterProdi.SelectedIndexChanged
         FilterData()
-        If btnEdomLock IsNot Nothing Then RefreshEdomLockStatus()
     End Sub
 
     Private Sub btnTabDosen_Click(sender As Object, e As EventArgs) Handles btnTabDosen.Click

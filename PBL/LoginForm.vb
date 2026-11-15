@@ -234,13 +234,8 @@ Public Class LoginForm
             UserSession.Email = userRow("email").ToString()
             UserSession.Role = userRow("role").ToString().Trim().ToLower()
             UserSession.StudyProgramId = If(IsDBNull(userRow("study_program_id")), 0, Convert.ToInt32(userRow("study_program_id")))
-            If UserSession.Role = "admin" OrElse UserSession.Role = "superadmin" Then
-                UserSession.NamaProdi = "Seluruh Jurusan"
-                UserSession.ProdiCode = "ALL"
-            Else
-                UserSession.NamaProdi = If(IsDBNull(userRow("prodi_name")), "Teknik Informatika", userRow("prodi_name").ToString())
-                UserSession.ProdiCode = If(IsDBNull(userRow("prodi_code")), "TI", userRow("prodi_code").ToString())
-            End If
+            UserSession.NamaProdi = If(IsDBNull(userRow("prodi_name")), "Teknik Informatika", userRow("prodi_name").ToString())
+            UserSession.ProdiCode = If(IsDBNull(userRow("prodi_code")), "TI", userRow("prodi_code").ToString())
 
             If UserSession.Role = "dosen" Then
                 Try
@@ -276,7 +271,7 @@ Public Class LoginForm
                     Dim dashboardDosen As New DosenDashboardForm()
                     dashboardDosen.Show()
 
-                Case "admin", "superadmin"
+                Case "admin"
                     Dim dashboardAdmin As New AdminDashboardForm()
                     dashboardAdmin.Show()
 
