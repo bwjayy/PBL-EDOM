@@ -7,6 +7,7 @@ USE edom_pbl;
 -- 1. Hapus tabel lama jika ada (urutan disesuaikan relasi foreign key)
 DROP TABLE IF EXISTS mahasiswa_profiles;
 DROP TABLE IF EXISTS dosen_profiles;
+DROP TABLE IF EXISTS edom_settings;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS study_programs;
 
@@ -43,6 +44,15 @@ CREATE TABLE mahasiswa_profiles (
     nim VARCHAR(20) NOT NULL,
     angkatan INT NOT NULL,
     CONSTRAINT fk_mahasiswa_profiles_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE edom_settings (
+    study_program_id INT PRIMARY KEY,
+    is_locked TINYINT(1) NOT NULL DEFAULT 0,
+    updated_by BIGINT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_edom_settings_program FOREIGN KEY (study_program_id) REFERENCES study_programs(id) ON DELETE CASCADE,
+    CONSTRAINT fk_edom_settings_admin FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 6. Data Master Program Studi

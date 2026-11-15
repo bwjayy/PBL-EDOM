@@ -7,6 +7,7 @@ USE edom_pbl;
 -- Tabel Program Studi
 DROP TABLE IF EXISTS mahasiswa_profiles;
 DROP TABLE IF EXISTS dosen_profiles;
+DROP TABLE IF EXISTS edom_settings;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS study_programs;
 
@@ -42,6 +43,15 @@ CREATE TABLE mahasiswa_profiles (
     nim VARCHAR(20) NOT NULL,
     angkatan INT NOT NULL,
     CONSTRAINT fk_mahasiswa_profiles_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE edom_settings (
+    study_program_id INT PRIMARY KEY,
+    is_locked TINYINT(1) NOT NULL DEFAULT 0,
+    updated_by BIGINT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_edom_settings_program FOREIGN KEY (study_program_id) REFERENCES study_programs(id) ON DELETE CASCADE,
+    CONSTRAINT fk_edom_settings_admin FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Data Master Program Studi
@@ -80,6 +90,7 @@ GO
 
 IF OBJECT_ID('mahasiswa_profiles', 'U') IS NOT NULL DROP TABLE mahasiswa_profiles;
 IF OBJECT_ID('dosen_profiles', 'U') IS NOT NULL DROP TABLE dosen_profiles;
+IF OBJECT_ID('edom_settings', 'U') IS NOT NULL DROP TABLE edom_settings;
 IF OBJECT_ID('users', 'U') IS NOT NULL DROP TABLE users;
 IF OBJECT_ID('study_programs', 'U') IS NOT NULL DROP TABLE study_programs;
 GO
@@ -110,6 +121,13 @@ CREATE TABLE mahasiswa_profiles (
     user_id BIGINT PRIMARY KEY FOREIGN KEY REFERENCES users(id),
     nim VARCHAR(20) NOT NULL,
     angkatan INT NOT NULL
+);
+
+CREATE TABLE edom_settings (
+    study_program_id INT PRIMARY KEY FOREIGN KEY REFERENCES study_programs(id) ON DELETE CASCADE,
+    is_locked BIT NOT NULL DEFAULT 0,
+    updated_by BIGINT NULL FOREIGN KEY REFERENCES users(id) ON DELETE SET NULL,
+    updated_at DATETIME2 NOT NULL DEFAULT SYSDATETIME()
 );
 GO
 
