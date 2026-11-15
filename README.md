@@ -31,7 +31,7 @@ Aplikasi Desktop berbasis **Visual Basic .NET (.NET 8 Windows Forms)** untuk pen
 ### 3. Akun Pengujian (Testing Accounts)
 | Peran (Role) | Email / Username | Kata Sandi | Halaman |
 | :--- | :--- | :--- | :--- |
-| **Admin Prodi** | `admin.ti@pnj.ac.id` | `admin123` | Dashboard Admin Prodi |
+| **Admin** | `admin@pnj.ac.id` | `admin123` | Dashboard Admin |
 | **Dosen** | `bambang.warsuta@pnj.ac.id` | `dosen123` | Dashboard Dosen |
 | **Mahasiswa** | `rahmat.ti@pnj.ac.id` | `mhs123` | Dashboard Mahasiswa |
 

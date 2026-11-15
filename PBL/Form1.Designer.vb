@@ -490,7 +490,7 @@ Partial Class Form1
         lblCountdownBadge.BackColor = Color.FromArgb(CByte(254), CByte(243), CByte(199))
         lblCountdownBadge.Font = New Font("Segoe UI Semibold", 8.25F, FontStyle.Bold)
         lblCountdownBadge.ForeColor = Color.FromArgb(CByte(146), CByte(64), CByte(14))
-        lblCountdownBadge.Location = New Point(18, 92)
+        lblCountdownBadge.Location = New Point(18, 86)
         lblCountdownBadge.Name = "lblCountdownBadge"
         lblCountdownBadge.Padding = New Padding(8, 3, 8, 3)
         lblCountdownBadge.Size = New Size(130, 25)
@@ -503,7 +503,7 @@ Partial Class Form1
         lblKpi3Value.AutoSize = True
         lblKpi3Value.Font = New Font("Segoe UI", 18.0F, FontStyle.Bold)
         lblKpi3Value.ForeColor = Color.FromArgb(CByte(15), CByte(23), CByte(42))
-        lblKpi3Value.Location = New Point(16, 48)
+        lblKpi3Value.Location = New Point(16, 42)
         lblKpi3Value.Name = "lblKpi3Value"
         lblKpi3Value.Size = New Size(277, 41)
         lblKpi3Value.TabIndex = 1
@@ -514,7 +514,7 @@ Partial Class Form1
         lblKpi3Title.AutoSize = True
         lblKpi3Title.Font = New Font("Segoe UI Semibold", 8.25F, FontStyle.Bold)
         lblKpi3Title.ForeColor = Color.FromArgb(CByte(100), CByte(116), CByte(139))
-        lblKpi3Title.Location = New Point(18, 18)
+        lblKpi3Title.Location = New Point(18, 16)
         lblKpi3Title.Name = "lblKpi3Title"
         lblKpi3Title.Size = New Size(125, 19)
         lblKpi3Title.TabIndex = 0
@@ -536,7 +536,7 @@ Partial Class Form1
         ' 
         pnlProgressBarBg.BackColor = Color.FromArgb(CByte(241), CByte(245), CByte(249))
         pnlProgressBarBg.Controls.Add(pnlProgressBarFill)
-        pnlProgressBarBg.Location = New Point(20, 96)
+        pnlProgressBarBg.Location = New Point(20, 90)
         pnlProgressBarBg.Name = "pnlProgressBarBg"
         pnlProgressBarBg.Size = New Size(293, 8)
         pnlProgressBarBg.TabIndex = 2
@@ -555,7 +555,7 @@ Partial Class Form1
         lblKpi2Value.AutoSize = True
         lblKpi2Value.Font = New Font("Segoe UI", 18.0F, FontStyle.Bold)
         lblKpi2Value.ForeColor = Color.FromArgb(CByte(192), CByte(0), CByte(0))
-        lblKpi2Value.Location = New Point(16, 48)
+        lblKpi2Value.Location = New Point(16, 42)
         lblKpi2Value.Name = "lblKpi2Value"
         lblKpi2Value.Size = New Size(275, 41)
         lblKpi2Value.TabIndex = 1
@@ -566,7 +566,7 @@ Partial Class Form1
         lblKpi2Title.AutoSize = True
         lblKpi2Title.Font = New Font("Segoe UI Semibold", 8.25F, FontStyle.Bold)
         lblKpi2Title.ForeColor = Color.FromArgb(CByte(100), CByte(116), CByte(139))
-        lblKpi2Title.Location = New Point(18, 18)
+        lblKpi2Title.Location = New Point(18, 16)
         lblKpi2Title.Name = "lblKpi2Title"
         lblKpi2Title.Size = New Size(155, 19)
         lblKpi2Title.TabIndex = 0
@@ -588,7 +588,7 @@ Partial Class Form1
         lblKpi1Value.AutoSize = True
         lblKpi1Value.Font = New Font("Segoe UI", 18.0F, FontStyle.Bold)
         lblKpi1Value.ForeColor = Color.FromArgb(CByte(15), CByte(23), CByte(42))
-        lblKpi1Value.Location = New Point(16, 48)
+        lblKpi1Value.Location = New Point(16, 42)
         lblKpi1Value.Name = "lblKpi1Value"
         lblKpi1Value.Size = New Size(220, 41)
         lblKpi1Value.TabIndex = 1
@@ -599,7 +599,7 @@ Partial Class Form1
         lblKpi1Title.AutoSize = True
         lblKpi1Title.Font = New Font("Segoe UI Semibold", 8.25F, FontStyle.Bold)
         lblKpi1Title.ForeColor = Color.FromArgb(CByte(100), CByte(116), CByte(139))
-        lblKpi1Title.Location = New Point(18, 18)
+        lblKpi1Title.Location = New Point(18, 16)
         lblKpi1Title.Name = "lblKpi1Title"
         lblKpi1Title.Size = New Size(143, 19)
         lblKpi1Title.TabIndex = 0
@@ -679,7 +679,7 @@ Partial Class Form1
         ' 
         ' Form1
         ' 
-        AutoScaleDimensions = New SizeF(8.0F, 20.0F)
+        AutoScaleDimensions = New SizeF(7.0F, 15.0F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.FromArgb(CByte(248), CByte(250), CByte(252))
         ClientSize = New Size(1380, 900)

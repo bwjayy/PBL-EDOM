@@ -40,7 +40,17 @@ Public Class Form1
         btnLogout.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnLogout.Width, btnLogout.Height), 6))
         btnTabAll.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnTabAll.Width, btnTabAll.Height), 6))
         btnTabPending.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnTabPending.Width, btnTabPending.Height), 6))
-        lblCountdownBadge.Region = New Region(GetRoundedPath(New Rectangle(0, 0, lblCountdownBadge.Width, lblCountdownBadge.Height), 6))
+        UpdateCountdownBadgeRegion()
+    End Sub
+
+    Private Sub UpdateCountdownBadgeRegion()
+        If lblCountdownBadge IsNot Nothing AndAlso lblCountdownBadge.Width > 0 AndAlso lblCountdownBadge.Height > 0 Then
+            lblCountdownBadge.Region = New Region(GetRoundedPath(New Rectangle(0, 0, lblCountdownBadge.Width, lblCountdownBadge.Height), 6))
+        End If
+    End Sub
+
+    Private Sub lblCountdownBadge_SizeChanged(sender As Object, e As EventArgs) Handles lblCountdownBadge.SizeChanged
+        UpdateCountdownBadgeRegion()
     End Sub
 
     Private Sub LoadStaticData()
@@ -76,7 +86,8 @@ Public Class Form1
         Else
             lblCountdownBadge.Text = "⏳ Sisa 23 Hari Lagi"
         End If
-        lblCountdownBadge.Region = New Region(GetRoundedPath(New Rectangle(0, 0, lblCountdownBadge.Width, lblCountdownBadge.Height), 6))
+        lblCountdownBadge.PerformLayout()
+        UpdateCountdownBadgeRegion()
     End Sub
 
     Private Sub SetupDataGridView()
@@ -418,11 +429,17 @@ Public Class Form1
         pnlContent.Left = 32
         pnlContent.Width = w
 
-        Dim cardWidth As Integer = (w - 32) \ 3
-        cardTotalMatkul.SetBounds(0, 0, cardWidth, cardTotalMatkul.Height)
-        cardProgress.SetBounds(cardTotalMatkul.Right + 16, 0, cardWidth, cardProgress.Height)
-        cardDeadline.SetBounds(cardProgress.Right + 16, 0, cardWidth, cardDeadline.Height)
+        Dim cardSpacing As Integer = 16
+        Dim cardHeight As Integer = 130
+        Dim cardWidth As Integer = (w - (cardSpacing * 2)) \ 3
+
+        cardTotalMatkul.SetBounds(0, 0, cardWidth, cardHeight)
+        cardProgress.SetBounds(cardTotalMatkul.Right + cardSpacing, 0, cardWidth, cardHeight)
+        cardDeadline.SetBounds(cardProgress.Right + cardSpacing, 0, cardWidth, cardHeight)
+        pnlKpiRow.Height = cardHeight + 4
         pnlKpiRow.Width = w
+
+        pnlProgressBarBg.Width = Math.Max(120, cardWidth - 40)
 
         pnlAlert.Width = w
         lblAlertText.Width = w - 40
