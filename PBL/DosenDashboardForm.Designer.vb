@@ -411,7 +411,7 @@ Partial Class DosenDashboardForm
         lblKpi3Sub.Name = "lblKpi3Sub"
         lblKpi3Sub.Size = New System.Drawing.Size(182, 13)
         lblKpi3Sub.TabIndex = 2
-        lblKpi3Sub.Text = "Partisipasi 91.8% mahasiswa kelas"
+        lblKpi3Sub.Text = "Menghitung responden..."
         '
         ' lblKpi3Value
         '
@@ -422,7 +422,7 @@ Partial Class DosenDashboardForm
         lblKpi3Value.Name = "lblKpi3Value"
         lblKpi3Value.Size = New System.Drawing.Size(177, 32)
         lblKpi3Value.TabIndex = 1
-        lblKpi3Value.Text = "45 Responden"
+        lblKpi3Value.Text = "-"
         '
         ' lblKpi3Title
         '
@@ -456,18 +456,18 @@ Partial Class DosenDashboardForm
         lblKpi2Sub.Name = "lblKpi2Sub"
         lblKpi2Sub.Size = New System.Drawing.Size(186, 13)
         lblKpi2Sub.TabIndex = 2
-        lblKpi2Sub.Text = "Derajat Keanggotaan Fuzzy μ = 0.92"
+        lblKpi2Sub.Text = "Menunggu perhitungan Fuzzy..."
         '
         ' lblKpi2Badge
         '
-        lblKpi2Badge.BackColor = System.Drawing.Color.FromArgb(CByte(236), CByte(253), CByte(245))
-        lblKpi2Badge.Font = New System.Drawing.Font("Segoe UI", 12.0F, System.Drawing.FontStyle.Bold)
-        lblKpi2Badge.ForeColor = System.Drawing.Color.FromArgb(CByte(4), CByte(120), CByte(87))
+        lblKpi2Badge.BackColor = System.Drawing.Color.FromArgb(CByte(241), CByte(245), CByte(249))
+        lblKpi2Badge.Font = New System.Drawing.Font("Segoe UI", 11.0F, System.Drawing.FontStyle.Bold)
+        lblKpi2Badge.ForeColor = System.Drawing.Color.FromArgb(CByte(71), CByte(85), CByte(105))
         lblKpi2Badge.Location = New System.Drawing.Point(18, 44)
         lblKpi2Badge.Name = "lblKpi2Badge"
         lblKpi2Badge.Size = New System.Drawing.Size(170, 32)
         lblKpi2Badge.TabIndex = 1
-        lblKpi2Badge.Text = "SANGAT BAIK"
+        lblKpi2Badge.Text = "MEMPROSES"
         lblKpi2Badge.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         ' lblKpi2Title
@@ -497,12 +497,12 @@ Partial Class DosenDashboardForm
         '
         lblKpi1Sub.AutoSize = True
         lblKpi1Sub.Font = New System.Drawing.Font("Segoe UI", 8.0F)
-        lblKpi1Sub.ForeColor = System.Drawing.Color.FromArgb(CByte(5), CByte(150), CByte(105))
+        lblKpi1Sub.ForeColor = System.Drawing.Color.FromArgb(CByte(100), CByte(116), CByte(139))
         lblKpi1Sub.Location = New System.Drawing.Point(18, 86)
         lblKpi1Sub.Name = "lblKpi1Sub"
         lblKpi1Sub.Size = New System.Drawing.Size(183, 13)
         lblKpi1Sub.TabIndex = 2
-        lblKpi1Sub.Text = "▲ +2.4 poin di atas rata-rata prodi"
+        lblKpi1Sub.Text = "Memuat data evaluasi..."
         '
         ' lblKpi1Value
         '
@@ -513,7 +513,7 @@ Partial Class DosenDashboardForm
         lblKpi1Value.Name = "lblKpi1Value"
         lblKpi1Value.Size = New System.Drawing.Size(138, 32)
         lblKpi1Value.TabIndex = 1
-        lblKpi1Value.Text = "87.5 / 100"
+        lblKpi1Value.Text = "- / 100"
         '
         ' lblKpi1Title
         '

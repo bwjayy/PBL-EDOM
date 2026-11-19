@@ -5,6 +5,9 @@ CREATE DATABASE IF NOT EXISTS edom_pbl;
 USE edom_pbl;
 
 -- 1. Hapus tabel lama jika ada (urutan disesuaikan relasi foreign key)
+DROP TABLE IF EXISTS edom_answers;
+DROP TABLE IF EXISTS course_offerings;
+DROP TABLE IF EXISTS edom_questions;
 DROP TABLE IF EXISTS mahasiswa_profiles;
 DROP TABLE IF EXISTS dosen_profiles;
 DROP TABLE IF EXISTS edom_settings;
@@ -26,6 +29,7 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL, -- 'admin', 'dosen', 'mahasiswa'
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
     CONSTRAINT fk_users_study_programs FOREIGN KEY (study_program_id) REFERENCES study_programs(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -63,6 +67,34 @@ CREATE TABLE IF NOT EXISTS edom_questions (
     is_active TINYINT(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 5c. Tabel Mata Kuliah & Dosen Pengampu
+CREATE TABLE IF NOT EXISTS course_offerings (
+    id INT PRIMARY KEY,
+    study_program_id INT NOT NULL,
+    dosen_id BIGINT NOT NULL,
+    kode_mk VARCHAR(20) NOT NULL,
+    nama_mk VARCHAR(150) NOT NULL,
+    kelas VARCHAR(20) NOT NULL,
+    sks INT NOT NULL DEFAULT 3,
+    semester VARCHAR(30) NOT NULL DEFAULT '2026/2027 Ganjil',
+    CONSTRAINT fk_offerings_program FOREIGN KEY (study_program_id) REFERENCES study_programs(id) ON DELETE CASCADE,
+    CONSTRAINT fk_offerings_dosen FOREIGN KEY (dosen_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 5d. Tabel Jawaban Evaluasi EDOM Mahasiswa
+CREATE TABLE IF NOT EXISTS edom_answers (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    mahasiswa_id BIGINT NOT NULL,
+    offering_id INT NOT NULL,
+    question_id BIGINT NOT NULL,
+    kategori_index INT NOT NULL,
+    nilai TINYINT NOT NULL,
+    submitted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_mhs_offering_question (mahasiswa_id, offering_id, question_id),
+    CONSTRAINT fk_answers_mahasiswa FOREIGN KEY (mahasiswa_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_answers_offering FOREIGN KEY (offering_id) REFERENCES course_offerings(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- 6. Data Master Program Studi
 INSERT INTO study_programs (id, code, name) VALUES
 (1, 'TI',  'Teknik Informatika'),
@@ -91,6 +123,16 @@ INSERT INTO dosen_profiles (user_id, nidn, gelar_depan, gelar_belakang) VALUES
 INSERT INTO mahasiswa_profiles (user_id, nim, angkatan) VALUES
 (3, '2207421035', 2022),
 (5, '2207421001', 2022);
+
+-- 7b. Data Mata Kuliah & Dosen Pengampu Semester Aktif
+INSERT INTO course_offerings (id, study_program_id, dosen_id, kode_mk, nama_mk, kelas, sks, semester) VALUES
+(1, 1, 2, 'TIK302', 'Manajemen Proyek TIK', 'TI-3C', 3, '2026/2027 Ganjil'),
+(2, 1, 2, 'TIK301', 'Pemrograman Visual', 'TI-3C', 3, '2026/2027 Ganjil'),
+(3, 1, 2, 'TIK304', 'Kecerdasan Buatan (AI)', 'TI-3C', 3, '2026/2027 Ganjil'),
+(4, 2, 4, 'TMJ308', 'Analisis dan Desain Sistem Informasi', 'TMJ-3A', 3, '2026/2027 Ganjil'),
+(5, 2, 4, 'TMJ306', 'Pemrograman Web Lanjut', 'TMJ-3A', 3, '2026/2027 Ganjil'),
+(6, 3, 2, 'TMD301', 'Pemrograman Visual', 'TMD-3A', 3, '2026/2027 Ganjil'),
+(7, 4, 4, 'RKS302', 'Keamanan Sistem Informasi', 'RKS-3A', 3, '2026/2027 Ganjil');
 
 -- 8. Data Master 27 Butir Instrumen Soal Kuisioner EDOM
 INSERT INTO edom_questions (id, nomor, kategori_index, kategori_judul, teks, is_active) VALUES

@@ -10,11 +10,12 @@ Public Class KuisionerModalForm
     Private ReadOnly colorMuted As Color = Color.FromArgb(100, 116, 139)
     Private ReadOnly colorGreen As Color = Color.FromArgb(5, 150, 105)
 
+    Private ReadOnly offeringId As Integer
     Private ReadOnly matkulJudul As String
     Private ReadOnly dosenNama As String
 
-    ' Struktur Pertanyaan dan Jawaban
     Public Class SoalEdom
+        Public Property QuestionId As Long
         Public Property Nomor As Integer
         Public Property Teks As String
         Public Property KategoriIndex As Integer
@@ -24,8 +25,9 @@ Public Class KuisionerModalForm
     Private ReadOnly daftarSoal As New List(Of SoalEdom)()
     Private ReadOnly pilPillControls As New Dictionary(Of String, Panel)()
 
-    Public Sub New(matkul As String, dosen As String)
+    Public Sub New(offeringId As Integer, matkul As String, dosen As String)
         InitializeComponent()
+        Me.offeringId = offeringId
         matkulJudul = matkul
         dosenNama = dosen
     End Sub
@@ -98,6 +100,7 @@ Public Class KuisionerModalForm
         Dim activeList = SoalKuisionerRepository.GetActiveSoal()
         For Each item In activeList
             daftarSoal.Add(New SoalEdom With {
+                .QuestionId = item.Id,
                 .Nomor = item.Nomor,
                 .Teks = item.Teks,
                 .KategoriIndex = item.KategoriIndex,
@@ -347,7 +350,6 @@ Public Class KuisionerModalForm
         End If
     End Sub
 
-    ' Validasi dan Kirim
     Private Sub btnKirim_Click(sender As Object, e As EventArgs) Handles btnKirim.Click
         If daftarSoal.Count = 0 Then
             MessageBox.Show("Tidak ada butir pernyataan kuisioner yang dapat dikirim.", "Kuisioner Kosong", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -372,11 +374,43 @@ Public Class KuisionerModalForm
             Return
         End If
 
-        MessageBox.Show("Terima kasih! Kuisioner EDOM untuk mata kuliah " & matkulJudul & " berhasil disimpan.",
-                        "Kuisioner Terkirim", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        Me.DialogResult = DialogResult.OK
-        Me.Close()
+        Dim answers As New List(Of AnswerInput)()
+        For Each s In daftarSoal
+            answers.Add(New AnswerInput With {
+                .QuestionId = s.QuestionId,
+                .KategoriIndex = s.KategoriIndex,
+                .Nilai = s.Jawaban
+            })
+        Next
+
+        btnKirim.Enabled = False
+        btnKirim.Text = "Menyimpan..."
+        Me.Cursor = Cursors.WaitCursor
+
+        Try
+            EdomEvaluationRepository.SaveAnswers(UserSession.UserId, offeringId, answers)
+            MessageBox.Show("Terima kasih! Kuisioner EDOM untuk mata kuliah " & matkulJudul & " berhasil disimpan ke database.",
+                            "Kuisioner Terkirim", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Me.DialogResult = DialogResult.OK
+            Me.Close()
+        Catch ex As Exception
+            MessageBox.Show("Gagal menyimpan kuisioner ke database: " & ex.Message,
+                            "Gagal Menyimpan", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            btnKirim.Enabled = True
+            btnKirim.Text = "Kirim Kuisioner"
+            Me.Cursor = Cursors.Default
+        End Try
     End Sub
+
+    Protected Overrides Function ProcessCmdKey(ByRef msg As Message, keyData As Keys) As Boolean
+        If keyData = Keys.Escape Then
+            Me.DialogResult = DialogResult.Cancel
+            Me.Close()
+            Return True
+        End If
+        Return MyBase.ProcessCmdKey(msg, keyData)
+    End Function
 
     Private Sub btnBatal_Click(sender As Object, e As EventArgs) Handles btnBatal.Click, btnClose.Click
         Me.DialogResult = DialogResult.Cancel

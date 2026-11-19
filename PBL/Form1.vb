@@ -20,37 +20,80 @@ Public Class Form1
 
     Private currentTab As String = "ALL"
     Private edomLocked As Boolean = False
+    Private isInitializing As Boolean = True
+    Private lblTableEmpty As Label
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If UserSession.IsLoggedIn Then
             lblSidebarUserName.Text = UserSession.Nama
             lblSidebarUserRole.Text = "Mahasiswa • " & If(String.IsNullOrWhiteSpace(UserSession.ProdiCode), "TI", UserSession.ProdiCode)
+            lblBreadcrumbTitle.Text = "Selamat datang kembali, " & UserSession.Nama
+            lblAlertText.Text = "Pengisian EDOM bersifat wajib bagi seluruh mahasiswa Program Studi " &
+                                If(String.IsNullOrWhiteSpace(UserSession.NamaProdi), "Teknik Informatika", UserSession.NamaProdi) &
+                                " sebagai syarat percetakan Kartu Hasil Studi (KHS)."
         End If
 
         cboTahunAkademik.Items.AddRange(New Object() {"2026/2027 Ganjil", "2025/2026 Genap", "2025/2026 Ganjil"})
         cboTahunAkademik.SelectedIndex = 0
 
         SetupDataGridView()
-        LoadStaticData()
+        SetupEmptyStateLabel()
+        isInitializing = False
+
+        LoadMahasiswaCourses()
         RefreshEdomLockStatus()
         ApplyControlRegions()
         AturLayoutResponsif()
+    End Sub
+
+    Private Sub SetupEmptyStateLabel()
+        lblTableEmpty = New Label With {
+            .Visible = False,
+            .Font = New Font("Segoe UI", 9.5!),
+            .ForeColor = colorMuted,
+            .TextAlign = ContentAlignment.MiddleCenter,
+            .BackColor = Color.White,
+            .Location = New Point(21, dgvEdom.Top + 12),
+            .Size = New Size(dgvEdom.Width, 90),
+            .Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        }
+        pnlTableCard.Controls.Add(lblTableEmpty)
+        lblTableEmpty.BringToFront()
+    End Sub
+
+    Private Sub UpdateCountdownBadgeDefault()
+        Dim deadline As New DateTime(2026, 12, 23)
+        Dim sisaHari As Integer = (deadline - DateTime.Today).Days
+        If sisaHari > 0 AndAlso sisaHari <= 90 Then
+            lblCountdownBadge.Text = "Sisa " & sisaHari.ToString() & " Hari Lagi"
+        ElseIf sisaHari <= 0 Then
+            lblCountdownBadge.Text = "Periode Berakhir"
+        Else
+            lblCountdownBadge.Text = "Sisa " & sisaHari.ToString() & " Hari Lagi"
+        End If
+        lblCountdownBadge.BackColor = colorAmberBg
+        lblCountdownBadge.ForeColor = Color.FromArgb(146, 64, 14)
+        lblCountdownBadge.PerformLayout()
+        UpdateCountdownBadgeRegion()
     End Sub
 
     Private Sub RefreshEdomLockStatus()
         Try
             edomLocked = EdomLockService.IsLocked(UserSession.StudyProgramId)
         Catch
-            ' Jika status tidak dapat dipastikan, blok pengisian agar penutupan periode tetap aman.
+            ' Block submission when lock state cannot be verified from DB.
             edomLocked = True
         End Try
         If edomLocked Then
             lblCountdownBadge.Text = "EDOM Dikunci Admin"
             lblCountdownBadge.BackColor = Color.FromArgb(254, 226, 226)
             lblCountdownBadge.ForeColor = Color.FromArgb(185, 28, 28)
-            lblCountdownBadge.Region = New Region(GetRoundedPath(New Rectangle(0, 0, lblCountdownBadge.Width, lblCountdownBadge.Height), 6))
-            dgvEdom.Invalidate()
+            lblCountdownBadge.PerformLayout()
+            UpdateCountdownBadgeRegion()
+        Else
+            UpdateCountdownBadgeDefault()
         End If
+        dgvEdom.Invalidate()
     End Sub
 
     Private Sub ApplyControlRegions()
@@ -71,41 +114,54 @@ Public Class Form1
         UpdateCountdownBadgeRegion()
     End Sub
 
-    Private Sub LoadStaticData()
+    Private Sub cboTahunAkademik_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboTahunAkademik.SelectedIndexChanged
+        If isInitializing Then Return
+        LoadMahasiswaCourses()
+    End Sub
+
+    Private Sub LoadMahasiswaCourses()
         dgvEdom.Rows.Clear()
-        Dim data = {
-            New Object() {1, "TIK309 - Grafika Komputer (3C)", "ANGGI MARDIYONO", "• Belum Terisi", "Isi Kuisioner"},
-            New Object() {2, "TIK308 - Analisis dan Desain Sistem Informasi (3C)", "ANITA HIDAYATI", "• Belum Terisi", "Isi Kuisioner"},
-            New Object() {3, "TIK306 - Pemrograman Web Lanjut (3C)", "ASEP TAUFIK MUHARRAM", "• Belum Terisi", "Isi Kuisioner"},
-            New Object() {4, "TIK302 - Manajemen Proyek TIK (3C)", "BAMBANG WARSUTA", "• Belum Terisi", "Isi Kuisioner"},
-            New Object() {5, "TIK301 - Pemrograman Visual (3C)", "CHAIRUL FIKRI", "• Belum Terisi", "Isi Kuisioner"},
-            New Object() {6, "TIK310 - Sistem Terdistribusi (3C)", "DEFIANA ARNALDY", "• Belum Terisi", "Isi Kuisioner"},
-            New Object() {7, "TIK305 - Metode Numerik (3C)", "FAJAR SEPTIAN", "• Belum Terisi", "Isi Kuisioner"},
-            New Object() {8, "TIK303 - Desain UI/UX (3C)", "IWAN SONJAYA", "• Belum Terisi", "Isi Kuisioner"},
-            New Object() {9, "TIK307 - Pemrograman Basis Data (3C)", "RISNA SARI", "• Belum Terisi", "Isi Kuisioner"},
-            New Object() {10, "TIK304 - Kecerdasan Buatan (3C)", "RIZKI ELISA NALAWATI", "• Belum Terisi", "Isi Kuisioner"}
-        }
-        For Each row In data
-            dgvEdom.Rows.Add(row)
-        Next
+        Dim semester As String = If(cboTahunAkademik.SelectedItem IsNot Nothing, cboTahunAkademik.SelectedItem.ToString(), "2026/2027 Ganjil")
 
-        dgvEdom.Height = dgvEdom.ColumnHeadersHeight + (dgvEdom.Rows.Count * dgvEdom.RowTemplate.Height) + 4
-        pnlTableCard.Height = dgvEdom.Top + dgvEdom.Height + 24
+        Try
+            Dim offerings = EdomEvaluationRepository.GetOfferingsForMahasiswa(UserSession.UserId, UserSession.StudyProgramId, semester)
+            Dim no As Integer = 1
+            For Each item In offerings
+                Dim statusText As String = If(item.SudahTerisi, "• Sudah Terisi", "• Belum Terisi")
+                Dim aksiText As String = If(item.SudahTerisi, "Selesai", "Isi Kuisioner")
+                Dim rowIdx = dgvEdom.Rows.Add(no, item.DisplayMatkul, item.DosenNama, statusText, aksiText)
+                dgvEdom.Rows(rowIdx).Tag = item
+                no += 1
+            Next
 
-        lblKpi1Value.Text = "10 Matakuliah"
-        lblKpi2Value.Text = "0 / 10 Selesai (0%)"
-        pnlProgressBarFill.Width = 0
+            lblKpi1Value.Text = offerings.Count.ToString() & " Matakuliah"
+            btnTabAll.Text = "Semua (" & offerings.Count.ToString() & ")"
 
-        ' Hitung sisa hari menuju batas pengisian
-        Dim deadline As New DateTime(2026, 12, 23)
-        Dim sisaHari As Integer = (deadline - DateTime.Today).Days
-        If sisaHari > 0 AndAlso sisaHari <= 90 Then
-            lblCountdownBadge.Text = "⏳ Sisa " & sisaHari.ToString() & " Hari Lagi"
-        Else
-            lblCountdownBadge.Text = "⏳ Sisa 23 Hari Lagi"
-        End If
-        lblCountdownBadge.PerformLayout()
-        UpdateCountdownBadgeRegion()
+            If offerings.Count = 0 Then
+                dgvEdom.Visible = False
+                lblTableEmpty.Text = "Belum ada mata kuliah terdaftar untuk semester " & semester & ". Pilih semester aktif di kanan atas."
+                lblTableEmpty.Visible = True
+                pnlTableCard.Height = lblTableEmpty.Bottom + 24
+            Else
+                lblTableEmpty.Visible = False
+                dgvEdom.Visible = True
+                dgvEdom.Height = dgvEdom.ColumnHeadersHeight + (dgvEdom.Rows.Count * dgvEdom.RowTemplate.Height) + 4
+                pnlTableCard.Height = dgvEdom.Top + dgvEdom.Height + 24
+            End If
+
+            UpdateProgressKpi()
+            ApplyFilter()
+        Catch ex As Exception
+            dgvEdom.Visible = False
+            lblKpi1Value.Text = "- Matakuliah"
+            lblKpi2Value.Text = "Gagal memuat data"
+            pnlProgressBarFill.Width = 0
+            lblTableEmpty.Text = "Gagal memuat daftar mata kuliah dari database: " & ex.Message
+            lblTableEmpty.Visible = True
+            pnlTableCard.Height = lblTableEmpty.Bottom + 24
+        End Try
+
+        AturLayoutResponsif()
     End Sub
 
     Private Sub SetupDataGridView()
@@ -206,14 +262,14 @@ Public Class Form1
         End If
     End Sub
 
-    ' Klik tombol Isi Kuisioner membuka modal popup
     Private Sub dgvEdom_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvEdom.CellClick
         If e.RowIndex < 0 Then Return
         If e.ColumnIndex = 4 Then
             RefreshEdomLockStatus()
             Dim row = dgvEdom.Rows(e.RowIndex)
-            Dim matkul = If(row.Cells(1).Value IsNot Nothing, row.Cells(1).Value.ToString(), "")
-            Dim dosen = If(row.Cells(2).Value IsNot Nothing, row.Cells(2).Value.ToString(), "")
+            Dim offering = TryCast(row.Tag, CourseOfferingItem)
+            If offering Is Nothing Then Return
+
             Dim status = If(row.Cells(3).Value IsNot Nothing, row.Cells(3).Value.ToString(), "")
 
             If edomLocked Then
@@ -221,12 +277,11 @@ Public Class Form1
                 Return
             End If
 
-            If status.Contains("Sudah Terisi") Then
+            If status.Contains("Sudah Terisi") OrElse offering.SudahTerisi Then
                 MessageBox.Show("Kuisioner untuk mata kuliah ini sudah selesai diisi.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
 
-            ' Tampilkan Modal Popup dengan Dimmed Backdrop
             Using overlay As New Form()
                 overlay.StartPosition = FormStartPosition.Manual
                 overlay.FormBorderStyle = FormBorderStyle.None
@@ -237,11 +292,9 @@ Public Class Form1
 
                 overlay.Show(Me)
 
-                Using popup As New KuisionerModalForm(matkul, dosen)
+                Using popup As New KuisionerModalForm(offering.OfferingId, offering.DisplayMatkul, offering.DosenNama)
                     If popup.ShowDialog(overlay) = DialogResult.OK Then
-                        row.Cells(3).Value = "• Sudah Terisi"
-                        UpdateProgressKpi()
-                        dgvEdom.InvalidateRow(e.RowIndex)
+                        LoadMahasiswaCourses()
                     End If
                 End Using
 
@@ -471,6 +524,7 @@ Public Class Form1
 
         pnlTableCard.Width = w
         dgvEdom.Width = w - 42
+        If lblTableEmpty IsNot Nothing Then lblTableEmpty.Width = w - 42
         lblTablePeriode.Left = w - lblTablePeriode.Width - 21
         pnlContent.Height = pnlTableCard.Bottom + 32
     End Sub

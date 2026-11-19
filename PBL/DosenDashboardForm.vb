@@ -1,6 +1,8 @@
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
+Imports System.Globalization
 Imports System.Linq
+Imports System.Threading.Tasks
 Imports System.Windows.Forms
 
 Public Class DosenDashboardForm
@@ -11,14 +13,18 @@ Public Class DosenDashboardForm
     Private ReadOnly colorMuted As Color = Color.FromArgb(100, 116, 139)
     Private ReadOnly colorDark As Color = Color.FromArgb(15, 23, 42)
 
-    Private ReadOnly colorGreen As Color = Color.FromArgb(5, 150, 105)
+    Private ReadOnly colorGreen As Color = Color.FromArgb(4, 120, 87)
     Private ReadOnly colorGreenBg As Color = Color.FromArgb(236, 253, 245)
-    Private ReadOnly colorAmber As Color = Color.FromArgb(217, 119, 6)
+    Private ReadOnly colorAmber As Color = Color.FromArgb(146, 64, 14)
     Private ReadOnly colorAmberBg As Color = Color.FromArgb(254, 243, 199)
+    Private ReadOnly colorRed As Color = Color.FromArgb(185, 28, 28)
+    Private ReadOnly colorRedBg As Color = Color.FromArgb(254, 226, 226)
+    Private ReadOnly colorSlate As Color = Color.FromArgb(71, 85, 105)
+    Private ReadOnly colorSlateBg As Color = Color.FromArgb(241, 245, 249)
     Private ReadOnly colorBlue As Color = Color.FromArgb(37, 99, 235)
     Private ReadOnly colorBlueBg As Color = Color.FromArgb(239, 246, 255)
 
-    Private Sub DosenDashboardForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub DosenDashboardForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If UserSession.IsLoggedIn Then
             lblSidebarUserName.Text = UserSession.GetNamaLengkapGelar()
             lblSidebarUserRole.Text = "Dosen • NIDN: " & If(String.IsNullOrWhiteSpace(UserSession.NIDN), "-", UserSession.NIDN)
@@ -27,8 +33,12 @@ Public Class DosenDashboardForm
 
         ApplyControlRegions()
         SetupDataGridView()
-        LoadDataMatkulDosen()
         AturLayoutResponsif()
+        Await LoadDataMatkulDosenAsync()
+    End Sub
+
+    Private Async Sub btnNavDashboard_Click(sender As Object, e As EventArgs) Handles btnNavDashboard.Click
+        Await LoadDataMatkulDosenAsync()
     End Sub
 
     Private Sub ApplyControlRegions()
@@ -83,50 +93,151 @@ Public Class DosenDashboardForm
             .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter}
         })
         dgvMatkul.Columns.Add(New DataGridViewTextBoxColumn With {
-            .Name = "colKategoriFuzzy", .HeaderText = "PREDIKAT AI", .Width = 145,
+            .Name = "colKategoriFuzzy", .HeaderText = "PREDIKAT AI", .Width = 150,
             .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter}
         })
     End Sub
 
-    Private Sub LoadDataMatkulDosen()
+    Private Async Function LoadDataMatkulDosenAsync() As Task
         dgvMatkul.Rows.Clear()
-        ' Data mata kuliah yang diampu oleh dosen yang login (dapat disinkronkan dengan database/backend AI)
-        Dim data = {
-            New Object() {1, "TIK302", "Manajemen Proyek TIK", "TI-3C", "3 SKS", "23 / 25 Mahasiswa", "89.20", "SANGAT BAIK"},
-            New Object() {2, "TIK302", "Manajemen Proyek TIK", "TI-3D", "3 SKS", "22 / 24 Mahasiswa", "85.80", "SANGAT BAIK"},
-            New Object() {3, "TIK301", "Pemrograman Visual", "TI-3A", "3 SKS", "24 / 24 Mahasiswa", "87.40", "SANGAT BAIK"},
-            New Object() {4, "TIK304", "Kecerdasan Buatan (AI)", "TI-3B", "3 SKS", "21 / 25 Mahasiswa", "86.10", "SANGAT BAIK"}
-        }
+        lblKpi1Value.Text = "Menghitung..."
+        lblKpi1Sub.Text = "Memuat data evaluasi dari database"
+        lblKpi1Sub.ForeColor = colorMuted
+        ApplyPredikatBadge(lblKpi2Badge, "MEMPROSES")
+        lblKpi2Sub.Text = "Menjalankan inferensi Fuzzy Mamdani..."
+        lblKpi3Value.Text = "-"
+        lblKpi3Sub.Text = "Menghitung responden..."
+        lblTableSub.Text = "Memuat hasil agregasi evaluasi mahasiswa per kelas..."
 
-        For Each row In data
-            dgvMatkul.Rows.Add(row)
-        Next
+        Try
+            Dim courses = EdomEvaluationRepository.GetDosenEvaluations(UserSession.UserId)
+            Dim overall = EdomEvaluationRepository.GetDosenOverallSummary(UserSession.UserId)
+            Dim evaluatedCourses As Integer = 0
+            Dim no As Integer = 1
 
-        ' Sesuaikan tinggi DataGridView dengan jumlah baris
-        dgvMatkul.Height = dgvMatkul.ColumnHeadersHeight + (dgvMatkul.Rows.Count * dgvMatkul.RowTemplate.Height) + 4
-        pnlTableCard.Height = dgvMatkul.Top + dgvMatkul.Height + 24
+            For Each c In courses
+                Dim skorText As String = "-"
+                Dim predText As String = "BELUM ADA DATA"
+
+                If c.HasCompleteCategories Then
+                    Dim fuzzy = Await FuzzyService.HitungAsync(
+                        c.AvgPedagogik.Value,
+                        c.AvgProfesional.Value,
+                        c.AvgKepribadian.Value,
+                        c.AvgSosial.Value)
+                    skorText = fuzzy.Skor.ToString("F2", CultureInfo.InvariantCulture)
+                    predText = fuzzy.Predikat.ToUpper()
+                    evaluatedCourses += 1
+                End If
+
+                dgvMatkul.Rows.Add(
+                    no,
+                    c.KodeMk,
+                    c.NamaMk,
+                    c.Kelas,
+                    c.Sks.ToString() & " SKS",
+                    c.RespondenCount.ToString() & " Mahasiswa",
+                    skorText,
+                    predText
+                )
+                no += 1
+            Next
+
+            If overall.HasCompleteCategories Then
+                Dim overallFuzzy = Await FuzzyService.HitungAsync(
+                    overall.AvgPedagogik.Value,
+                    overall.AvgProfesional.Value,
+                    overall.AvgKepribadian.Value,
+                    overall.AvgSosial.Value)
+
+                lblKpi1Value.Text = overallFuzzy.Skor.ToString("F2", CultureInfo.InvariantCulture) & " / 100"
+                lblKpi1Sub.Text = String.Format(
+                    CultureInfo.InvariantCulture,
+                    "Ped {0:F2} • Pro {1:F2} • Kep {2:F2} • Sos {3:F2}",
+                    overall.AvgPedagogik.Value,
+                    overall.AvgProfesional.Value,
+                    overall.AvgKepribadian.Value,
+                    overall.AvgSosial.Value)
+                lblKpi1Sub.ForeColor = colorMuted
+
+                ApplyPredikatBadge(lblKpi2Badge, overallFuzzy.Predikat.ToUpper())
+                Dim maxMu As Double = Math.Max(overallFuzzy.MuKurang, Math.Max(overallFuzzy.MuCukup, overallFuzzy.MuBaik))
+                lblKpi2Sub.Text = String.Format(CultureInfo.InvariantCulture, "Agregasi Fuzzy: μ = {0:F2} ({1})", maxMu, overallFuzzy.Predikat)
+            Else
+                lblKpi1Value.Text = "- / 100"
+                lblKpi1Sub.Text = "Belum ada evaluasi mahasiswa masuk"
+                lblKpi1Sub.ForeColor = colorMuted
+                ApplyPredikatBadge(lblKpi2Badge, "BELUM ADA DATA")
+                lblKpi2Sub.Text = "Skor dihitung otomatis setelah mahasiswa mengisi"
+            End If
+
+            lblKpi3Value.Text = overall.RespondenCount.ToString() & " Evaluasi"
+            lblKpi3Sub.Text = evaluatedCourses.ToString() & " dari " & courses.Count.ToString() & " mata kuliah terisi"
+            lblTableSub.Text = If(courses.Count = 0,
+                "Belum ada mata kuliah yang ditugaskan pada semester aktif.",
+                "Hasil agregasi evaluasi mahasiswa per kelas semester aktif (Fuzzy Mamdani)")
+
+            Dim minHeight As Integer = dgvMatkul.ColumnHeadersHeight + 54
+            dgvMatkul.Height = Math.Max(minHeight, dgvMatkul.ColumnHeadersHeight + (dgvMatkul.Rows.Count * dgvMatkul.RowTemplate.Height) + 4)
+            pnlTableCard.Height = dgvMatkul.Top + dgvMatkul.Height + 24
+            pnlContent.Height = Math.Max(630, pnlTableCard.Bottom + 24)
+        Catch ex As Exception
+            lblKpi1Value.Text = "Error"
+            lblKpi1Sub.Text = "Periksa koneksi MySQL dan Python PATH"
+            lblKpi1Sub.ForeColor = colorRed
+            ApplyPredikatBadge(lblKpi2Badge, "GAGAL HITUNG")
+            lblKpi2Sub.Text = ex.Message
+            lblKpi3Value.Text = "-"
+            lblKpi3Sub.Text = "Klik menu Rekap Hasil EDOM untuk mencoba lagi"
+            lblTableSub.Text = "Gagal memuat evaluasi: " & ex.Message
+        End Try
+    End Function
+
+    Private Sub GetPredikatColors(predikat As String, ByRef bgCol As Color, ByRef txtCol As Color)
+        Dim key As String = If(predikat, "").Trim().ToUpper()
+        If key.Contains("BAIK") Then
+            bgCol = colorGreenBg
+            txtCol = colorGreen
+        ElseIf key.Contains("CUKUP") Then
+            bgCol = colorAmberBg
+            txtCol = colorAmber
+        ElseIf key.Contains("KURANG") OrElse key.Contains("GAGAL") Then
+            bgCol = colorRedBg
+            txtCol = colorRed
+        Else
+            bgCol = colorSlateBg
+            txtCol = colorSlate
+        End If
     End Sub
 
-    ' Render Pill Badge khusus untuk Status & Predikat Fuzzy
+    Private Sub ApplyPredikatBadge(lbl As Label, text As String)
+        Dim bgCol As Color
+        Dim txtCol As Color
+        GetPredikatColors(text, bgCol, txtCol)
+        lbl.Text = text
+        lbl.BackColor = bgCol
+        lbl.ForeColor = txtCol
+    End Sub
+
     Private Sub dgvMatkul_CellPainting(sender As Object, e As DataGridViewCellPaintingEventArgs) Handles dgvMatkul.CellPainting
         If e.RowIndex < 0 Then Return
 
-        ' Kolom Predikat AI (Index 7)
         If e.ColumnIndex = 7 AndAlso e.Value IsNot Nothing Then
             e.PaintBackground(e.CellBounds, True)
             Dim text As String = e.Value.ToString()
-            Dim isSangatBaik As Boolean = text.ToUpper().Contains("SANGAT BAIK")
-            Dim bgCol As Color = If(isSangatBaik, colorGreenBg, colorAmberBg)
-            Dim txtCol As Color = If(isSangatBaik, colorGreen, colorAmber)
+            Dim bgCol As Color
+            Dim txtCol As Color
+            GetPredikatColors(text, bgCol, txtCol)
 
-            Dim pillRect As New Rectangle(e.CellBounds.X + (e.CellBounds.Width - 120) \ 2, e.CellBounds.Y + (e.CellBounds.Height - 26) \ 2, 120, 26)
+            Dim pillW As Integer = Math.Min(134, e.CellBounds.Width - 12)
+            Dim pillRect As New Rectangle(e.CellBounds.X + (e.CellBounds.Width - pillW) \ 2, e.CellBounds.Y + (e.CellBounds.Height - 26) \ 2, pillW, 26)
 
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
             Using path As GraphicsPath = GetRoundedPath(pillRect, 13), brBg As New SolidBrush(bgCol)
                 e.Graphics.FillPath(brBg, path)
             End Using
 
-            Using fontPill As New Font("Segoe UI Semibold", 8.25!, FontStyle.Bold),
+            Using fontPill As New Font("Segoe UI Semibold", 8.0!, FontStyle.Bold),
                   brText As New SolidBrush(txtCol),
                   sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
                 e.Graphics.DrawString(text, fontPill, brText, pillRect, sf)
@@ -135,7 +246,6 @@ Public Class DosenDashboardForm
             Return
         End If
 
-        ' Kolom Skor Fuzzy (Index 6)
         If e.ColumnIndex = 6 AndAlso e.Value IsNot Nothing Then
             e.PaintBackground(e.CellBounds, True)
             Dim text As String = e.Value.ToString()
