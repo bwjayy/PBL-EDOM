@@ -53,6 +53,16 @@ CREATE TABLE edom_settings (
     CONSTRAINT fk_edom_settings_program FOREIGN KEY (study_program_id) REFERENCES study_programs(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 5b. Tabel Soal Kuisioner EDOM Dinamis
+CREATE TABLE IF NOT EXISTS edom_questions (
+    id BIGINT PRIMARY KEY,
+    nomor INT NOT NULL,
+    kategori_index INT NOT NULL,
+    kategori_judul VARCHAR(100) NOT NULL,
+    teks TEXT NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- 6. Data Master Program Studi
 INSERT INTO study_programs (id, code, name) VALUES
 (1, 'TI',  'Teknik Informatika'),
@@ -81,3 +91,33 @@ INSERT INTO dosen_profiles (user_id, nidn, gelar_depan, gelar_belakang) VALUES
 INSERT INTO mahasiswa_profiles (user_id, nim, angkatan) VALUES
 (3, '2207421035', 2022),
 (5, '2207421001', 2022);
+
+-- 8. Data Master 27 Butir Instrumen Soal Kuisioner EDOM
+INSERT INTO edom_questions (id, nomor, kategori_index, kategori_judul, teks, is_active) VALUES
+(1, 1, 1, '1. Kompetensi Pedagogik', 'Kesiapan memberikan kuliah dan/atau praktek/praktikum', 1),
+(2, 2, 1, '1. Kompetensi Pedagogik', 'Keteraturan dan ketertiban penyelenggaraan perkuliahan', 1),
+(3, 3, 1, '1. Kompetensi Pedagogik', 'Kemampuan menghidupkan suasana kelas', 1),
+(4, 4, 1, '1. Kompetensi Pedagogik', 'Kejelasan penyampaian materi dan jawaban terhadap pertanyaan di kelas', 1),
+(5, 5, 1, '1. Kompetensi Pedagogik', 'Pemanfaatan media dan teknologi pembelajaran', 1),
+(6, 6, 1, '1. Kompetensi Pedagogik', 'Keanekaragaman cara pengukuran/penilaian hasil belajar', 1),
+(7, 7, 1, '1. Kompetensi Pedagogik', 'Pemberian umpan balik terhadap tugas/penilaian', 1),
+(8, 8, 1, '1. Kompetensi Pedagogik', 'Kesesuaian materi ujian dan/atau tugas dengan tujuan mata kuliah', 1),
+(9, 9, 1, '1. Kompetensi Pedagogik', 'Kesesuaian nilai yang diberikan dengan hasil belajar', 1),
+(10, 1, 2, '2. Kompetensi Profesional', 'Kemampuan menjelaskan pokok bahasan/topik secara tepat sesuai GBPP dan SAP', 1),
+(11, 2, 2, '2. Kompetensi Profesional', 'Kemampuan memberi contoh relevan dari konsep yang diajarkan berdasarkan Program Studi', 1),
+(12, 3, 2, '2. Kompetensi Profesional', 'Kemampuan menjelaskan keterkaitan bidang/topik yang diajarkan dengan bidang/topik lain', 1),
+(13, 4, 2, '2. Kompetensi Profesional', 'Kemampuan menjelaskan keterkaitan bidang/topik yang diajarkan dengan konteks kehidupan', 1),
+(14, 5, 2, '2. Kompetensi Profesional', 'Penguasaan akan isu-isu mutakhir dalam bidang yang diajarkan (kemutakhiran bahan kuliah)', 1),
+(15, 6, 2, '2. Kompetensi Profesional', 'Penggunaan hasil-hasil penelitian untuk meningkatkan kualitas perkuliahan', 1),
+(16, 7, 2, '2. Kompetensi Profesional', 'Pelibatan mahasiswa dalam penelitian/kajian dan atau pengembangan/desain dosen', 1),
+(17, 8, 2, '2. Kompetensi Profesional', 'Kemampuan menggunakan beragam teknologi komunikasi', 1),
+(18, 1, 3, '3. Kompetensi Kepribadian', 'Kewibawaan sebagai pribadi dosen', 1),
+(19, 2, 3, '3. Kompetensi Kepribadian', 'Kearifan dalam mengambil keputusan', 1),
+(20, 3, 3, '3. Kompetensi Kepribadian', 'Menjadi contoh dalam bersikap dan berperilaku', 1),
+(21, 4, 3, '3. Kompetensi Kepribadian', 'Satu kata dan tindakan', 1),
+(22, 5, 3, '3. Kompetensi Kepribadian', 'Kemampuan mengendalikan diri dalam berbagai situasi dan kondisi', 1),
+(23, 6, 3, '3. Kompetensi Kepribadian', 'Adil dalam memperlakukan mahasiswa', 1),
+(24, 1, 4, '4. Kompetensi Sosial', 'Kemampuan menyampaikan pendapat', 1),
+(25, 2, 4, '4. Kompetensi Sosial', 'Kemampuan menerima kritik, saran, dan pendapat dari mahasiswa', 1),
+(26, 3, 4, '4. Kompetensi Sosial', 'Mengenal dengan baik mahasiswa yang mengikuti kuliahnya', 1),
+(27, 4, 4, '4. Kompetensi Sosial', 'Toleransi terhadap keberagaman mahasiswa', 1);

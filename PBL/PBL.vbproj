@@ -47,6 +47,10 @@
     <EmbeddedResource Update="AkunModalForm.resx">
       <DependentUpon>AkunModalForm.vb</DependentUpon>
     </EmbeddedResource>
+    <Compile Update="SoalModalForm.vb" />
+    <Compile Update="SoalModalForm.Designer.vb">
+      <DependentUpon>SoalModalForm.vb</DependentUpon>
+    </Compile>
     <Compile Update="My Project\Resources.Designer.vb">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

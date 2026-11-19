@@ -25,6 +25,7 @@ Partial Class AdminDashboardForm
     Friend WithEvents lblNavHeader As System.Windows.Forms.Label
     Friend WithEvents btnNavDashboard As System.Windows.Forms.Button
     Friend WithEvents btnNavManajemenAkun As System.Windows.Forms.Button
+    Friend WithEvents btnNavKelolaSoal As System.Windows.Forms.Button
     Friend WithEvents pnlUserCard As System.Windows.Forms.Panel
     Friend WithEvents picUserAvatar As System.Windows.Forms.PictureBox
     Friend WithEvents lblSidebarUserName As System.Windows.Forms.Label
@@ -116,6 +117,7 @@ Partial Class AdminDashboardForm
         pnlNavContainer = New System.Windows.Forms.Panel()
         btnNavDashboard = New System.Windows.Forms.Button()
         btnNavManajemenAkun = New System.Windows.Forms.Button()
+        btnNavKelolaSoal = New System.Windows.Forms.Button()
         lblNavHeader = New System.Windows.Forms.Label()
         pnlBrand = New System.Windows.Forms.Panel()
         lblSidebarSub = New System.Windows.Forms.Label()
@@ -244,6 +246,7 @@ Partial Class AdminDashboardForm
         '
         ' pnlNavContainer
         '
+        pnlNavContainer.Controls.Add(btnNavKelolaSoal)
         pnlNavContainer.Controls.Add(btnNavManajemenAkun)
         pnlNavContainer.Controls.Add(btnNavDashboard)
         pnlNavContainer.Controls.Add(lblNavHeader)
@@ -285,6 +288,22 @@ Partial Class AdminDashboardForm
         btnNavManajemenAkun.Text = "Manajemen Akun"
         btnNavManajemenAkun.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         btnNavManajemenAkun.UseVisualStyleBackColor = False
+        '
+        ' btnNavKelolaSoal
+        '
+        btnNavKelolaSoal.BackColor = System.Drawing.Color.Transparent
+        btnNavKelolaSoal.Cursor = System.Windows.Forms.Cursors.Hand
+        btnNavKelolaSoal.FlatAppearance.BorderSize = 0
+        btnNavKelolaSoal.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        btnNavKelolaSoal.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0F, System.Drawing.FontStyle.Bold)
+        btnNavKelolaSoal.ForeColor = System.Drawing.Color.FromArgb(CByte(100), CByte(116), CByte(139))
+        btnNavKelolaSoal.Location = New System.Drawing.Point(16, 126)
+        btnNavKelolaSoal.Name = "btnNavKelolaSoal"
+        btnNavKelolaSoal.Size = New System.Drawing.Size(208, 38)
+        btnNavKelolaSoal.TabIndex = 3
+        btnNavKelolaSoal.Text = "Kelola Soal EDOM"
+        btnNavKelolaSoal.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        btnNavKelolaSoal.UseVisualStyleBackColor = False
         '
         ' lblNavHeader
         '

@@ -92,84 +92,56 @@ Public Class KuisionerModalForm
         End Using
     End Sub
 
-    ' 27 Butir Instrumen Resmi EDOM 2023 (4 Kategori)
     Private Sub InisialisasiDaftarSoal()
         daftarSoal.Clear()
-
-        ' Kategori 1: Pedagogik (9 soal)
-        Dim pedagogik = {
-            "Kesiapan memberikan kuliah dan/atau praktek/praktikum",
-            "Keteraturan dan ketertiban penyelenggaraan perkuliahan",
-            "Kemampuan menghidupkan suasana kelas",
-            "Kejelasan penyampaian materi dan jawaban terhadap pertanyaan di kelas",
-            "Pemanfaatan media dan teknologi pembelajaran",
-            "Keanekaragaman cara pengukuran/penilaian hasil belajar",
-            "Pemberian umpan balik terhadap tugas/penilaian",
-            "Kesesuaian materi ujian dan/atau tugas dengan tujuan mata kuliah",
-            "Kesesuaian nilai yang diberikan dengan hasil belajar"
-        }
-        For i = 0 To pedagogik.Length - 1
-            daftarSoal.Add(New SoalEdom With {.Nomor = i + 1, .Teks = pedagogik(i), .KategoriIndex = 1})
-        Next
-
-        ' Kategori 2: Profesional (8 soal)
-        Dim profesional = {
-            "Kemampuan menjelaskan pokok bahasan/topik secara tepat sesuai GBPP dan SAP",
-            "Kemampuan memberi contoh relevan dari konsep yang diajarkan berdasarkan Program Studi",
-            "Kemampuan menjelaskan keterkaitan bidang/topik yang diajarkan dengan bidang/topik lain",
-            "Kemampuan menjelaskan keterkaitan bidang/topik yang diajarkan dengan konteks kehidupan",
-            "Penguasaan akan isu-isu mutakhir dalam bidang yang diajarkan (kemutakhiran bahan kuliah)",
-            "Penggunaan hasil-hasil penelitian untuk meningkatkan kualitas perkuliahan",
-            "Pelibatan mahasiswa dalam penelitian/kajian dan atau pengembangan/desain dosen",
-            "Kemampuan menggunakan beragam teknologi komunikasi"
-        }
-        For i = 0 To profesional.Length - 1
-            daftarSoal.Add(New SoalEdom With {.Nomor = 10 + i, .Teks = profesional(i), .KategoriIndex = 2})
-        Next
-
-        ' Kategori 3: Kepribadian (6 soal)
-        Dim kepribadian = {
-            "Kewibawaan sebagai pribadi dosen",
-            "Kearifan dalam mengambil keputusan",
-            "Menjadi contoh dalam bersikap dan berperilaku",
-            "Satu kata dan tindakan",
-            "Kemampuan mengendalikan diri dalam berbagai situasi dan kondisi",
-            "Adil dalam memperlakukan mahasiswa"
-        }
-        For i = 0 To kepribadian.Length - 1
-            daftarSoal.Add(New SoalEdom With {.Nomor = 18 + i, .Teks = kepribadian(i), .KategoriIndex = 3})
-        Next
-
-        ' Kategori 4: Sosial (4 soal)
-        Dim sosial = {
-            "Kemampuan menyampaikan pendapat",
-            "Kemampuan menerima kritik, saran, dan pendapat dari mahasiswa",
-            "Mengenal dengan baik mahasiswa yang mengikuti kuliahnya",
-            "Toleransi terhadap keberagaman mahasiswa"
-        }
-        For i = 0 To sosial.Length - 1
-            daftarSoal.Add(New SoalEdom With {.Nomor = 24 + i, .Teks = sosial(i), .KategoriIndex = 4})
+        SoalKuisionerRepository.EnsureInitialized()
+        Dim activeList = SoalKuisionerRepository.GetActiveSoal()
+        For Each item In activeList
+            daftarSoal.Add(New SoalEdom With {
+                .Nomor = item.Nomor,
+                .Teks = item.Teks,
+                .KategoriIndex = item.KategoriIndex,
+                .Jawaban = 0
+            })
         Next
     End Sub
 
-    ' Render 4 Card Kategori secara dinamis dan responsif
+    ' Render Card Kategori secara dinamis dan responsif
     Private Sub RenderKuisionerCards()
         pnlScrollQuestions.SuspendLayout()
         pnlScrollQuestions.Controls.Clear()
         pilPillControls.Clear()
 
-        Dim kategoriData = {
-            New With {.Index = 1, .Judul = "1. Kompetensi Pedagogik", .Jumlah = 9},
-            New With {.Index = 2, .Judul = "2. Kompetensi Profesional", .Jumlah = 8},
-            New With {.Index = 3, .Judul = "3. Kompetensi Kepribadian", .Jumlah = 6},
-            New With {.Index = 4, .Judul = "4. Kompetensi Sosial", .Jumlah = 4}
-        }
+        Dim distinctKategori = daftarSoal.Select(Function(s) s.KategoriIndex).Distinct().OrderBy(Function(k) k).ToList()
+
+        If distinctKategori.Count = 0 Then
+            Dim emptyCard As New Panel With {
+                .BackColor = Color.White,
+                .Left = 24,
+                .Top = 24,
+                .Width = pnlScrollQuestions.ClientSize.Width - 48,
+                .Height = 120,
+                .Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+            }
+            Dim lblEmpty As New Label With {
+                .Text = "Belum ada butir pernyataan kuisioner aktif yang tersedia saat ini.",
+                .Font = New Font("Segoe UI", 10.0!),
+                .ForeColor = colorMuted,
+                .Dock = DockStyle.Fill,
+                .TextAlign = ContentAlignment.MiddleCenter
+            }
+            emptyCard.Controls.Add(lblEmpty)
+            pnlScrollQuestions.Controls.Add(emptyCard)
+            pnlScrollQuestions.ResumeLayout(True)
+            Return
+        End If
 
         Dim cardY As Integer = 16
         Dim cardWidth As Integer = pnlScrollQuestions.ClientSize.Width - 48 - SystemInformation.VerticalScrollBarWidth
 
-        For Each kat In kategoriData
-            Dim soalKategori = daftarSoal.Where(Function(s) s.KategoriIndex = kat.Index).ToList()
+        For Each katIndex In distinctKategori
+            Dim katIdx = katIndex
+            Dim soalKategori = daftarSoal.Where(Function(s) s.KategoriIndex = katIdx).ToList()
             Dim cardHeight As Integer = 46 + (soalKategori.Count * 48) + 8
 
             Dim card As New Panel With {
@@ -190,7 +162,7 @@ Public Class KuisionerModalForm
             }
 
             Dim lblKatTitle As New Label With {
-                .Text = kat.Judul,
+                .Text = SoalKuisionerRepository.GetKategoriTitle(katIdx),
                 .Font = New Font("Segoe UI", 9.5!, FontStyle.Bold),
                 .ForeColor = Color.FromArgb(15, 23, 42),
                 .AutoSize = False,
@@ -200,7 +172,7 @@ Public Class KuisionerModalForm
             }
 
             Dim lblKatBadge As New Label With {
-                .Text = kat.Jumlah.ToString() & " pernyataan",
+                .Text = soalKategori.Count.ToString() & " pernyataan",
                 .Font = New Font("Segoe UI Semibold", 8.0!, FontStyle.Bold),
                 .ForeColor = colorMuted,
                 .AutoSize = False,
@@ -305,12 +277,12 @@ Public Class KuisionerModalForm
             .Cursor = Cursors.Hand
         }
 
-        Dim key As String = item.Nomor.ToString() & "_" & score.ToString()
+        Dim key As String = item.KategoriIndex.ToString() & "_" & item.Nomor.ToString() & "_" & score.ToString()
         pilPillControls(key) = pill
 
         Dim onClick As EventHandler = Sub(s, e)
             item.Jawaban = score
-            UpdateRowPillsState(item.Nomor, score)
+            UpdateRowPillsState(item.KategoriIndex, item.Nomor, score)
             UpdateCounter()
         End Sub
 
@@ -335,9 +307,9 @@ Public Class KuisionerModalForm
         Return pill
     End Function
 
-    Private Sub UpdateRowPillsState(soalNomor As Integer, selectedScore As Integer)
+    Private Sub UpdateRowPillsState(kategoriIndex As Integer, soalNomor As Integer, selectedScore As Integer)
         For s = 1 To 3
-            Dim key As String = soalNomor.ToString() & "_" & s.ToString()
+            Dim key As String = kategoriIndex.ToString() & "_" & soalNomor.ToString() & "_" & s.ToString()
             If pilPillControls.ContainsKey(key) Then
                 Dim pill = pilPillControls(key)
                 Dim rb = pill.Controls.OfType(Of RadioButton)().FirstOrDefault()
@@ -355,6 +327,15 @@ Public Class KuisionerModalForm
         Dim answered As Integer = daftarSoal.Where(Function(s) s.Jawaban > 0).Count()
         Dim total As Integer = daftarSoal.Count
 
+        If total = 0 Then
+            lblFooterCounter.Text = "Tidak ada pernyataan kuisioner aktif"
+            lblFooterCounter.ForeColor = colorMuted
+            lblFooterHint.Text = "Hubungi administrator untuk mengaktifkan butir pernyataan kuisioner."
+            btnKirim.Enabled = False
+            Return
+        End If
+
+        btnKirim.Enabled = True
         If answered = total Then
             lblFooterCounter.Text = total.ToString() & " Pernyataan Lengkap Terisi (100%)"
             lblFooterCounter.ForeColor = colorGreen
@@ -368,6 +349,11 @@ Public Class KuisionerModalForm
 
     ' Validasi dan Kirim
     Private Sub btnKirim_Click(sender As Object, e As EventArgs) Handles btnKirim.Click
+        If daftarSoal.Count = 0 Then
+            MessageBox.Show("Tidak ada butir pernyataan kuisioner yang dapat dikirim.", "Kuisioner Kosong", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
         Try
             If EdomLockService.IsLocked(UserSession.StudyProgramId) Then
                 MessageBox.Show("Periode pengisian EDOM telah dikunci oleh admin. Jawaban tidak dapat dikirim.", "EDOM Dikunci", MessageBoxButtons.OK, MessageBoxIcon.Warning)

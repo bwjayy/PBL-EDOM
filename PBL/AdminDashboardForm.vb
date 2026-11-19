@@ -22,9 +22,39 @@ Public Class AdminDashboardForm
     Private btnEdomLock As Button
 
     ' State & Komponen Manajemen Akun
-    Private currentMenu As String = "DASHBOARD" ' "DASHBOARD" atau "MANAJEMEN_AKUN"
+    Private currentMenu As String = "DASHBOARD" ' "DASHBOARD", "MANAJEMEN_AKUN", atau "KELOLA_SOAL"
     Private akunCurrentRoleFilter As String = "ALL" ' "ALL", "DOSEN", atau "MAHASISWA"
     Private akunSearchFocused As Boolean = False
+
+    ' State & Komponen Kelola Soal Kuisioner
+    Private pnlContentSoal As Panel
+    Private pnlSoalKpiRow As Panel
+    Private cardSoalTotal As Panel
+    Private lblSoalTotalValue As Label
+    Private cardSoalAktif As Panel
+    Private lblSoalAktifValue As Label
+    Private cardSoalKategori As Panel
+    Private lblSoalKategoriValue As Label
+
+    Private pnlSoalTableCard As Panel
+    Private pnlSoalHeaderRow As Panel
+    Private lblSoalTableTitle As Label
+    Private lblSoalTableSub As Label
+    Private btnTambahSoal As Button
+
+    Private pnlSoalFilterToolbar As Panel
+    Private btnSoalTabAll As Button
+    Private btnSoalTabPedagogik As Button
+    Private btnSoalTabProfesional As Button
+    Private btnSoalTabKepribadian As Button
+    Private btnSoalTabSosial As Button
+
+    Private pnlSoalSearchBox As Panel
+    Private txtSoalSearch As TextBox
+    Private dgvSoal As DataGridView
+
+    Private soalCurrentCategoryFilter As Integer = 0
+    Private soalSearchFocused As Boolean = False
 
     Private Sub AdminDashboardForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         lblSidebarUserName.Text = If(UserSession.IsLoggedIn AndAlso Not String.IsNullOrWhiteSpace(UserSession.Nama), UserSession.Nama, "Admin")
@@ -33,6 +63,7 @@ Public Class AdminDashboardForm
 
         PopulateProdiFilter()
         InitManajemenAkunView()
+        InitKelolaSoalView()
         SetupEdomLockControls()
         RefreshEdomLockStatus()
         ApplyControlRegions()
@@ -175,6 +206,9 @@ Public Class AdminDashboardForm
     Private Sub ApplyControlRegions()
         btnNavDashboard.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnNavDashboard.Width, btnNavDashboard.Height), 8))
         btnNavManajemenAkun.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnNavManajemenAkun.Width, btnNavManajemenAkun.Height), 8))
+        If btnNavKelolaSoal IsNot Nothing Then
+            btnNavKelolaSoal.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnNavKelolaSoal.Width, btnNavKelolaSoal.Height), 8))
+        End If
         btnLogout.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnLogout.Width, btnLogout.Height), 6))
         If lblBadgeProdi.Visible Then
             lblBadgeProdi.Region = New Region(GetRoundedPath(New Rectangle(0, 0, lblBadgeProdi.Width, lblBadgeProdi.Height), 8))
@@ -198,6 +232,20 @@ Public Class AdminDashboardForm
         If pnlAkunSearchBox IsNot Nothing Then
             pnlAkunSearchBox.Region = New Region(GetRoundedPath(New Rectangle(0, 0, pnlAkunSearchBox.Width, pnlAkunSearchBox.Height), 6))
         End If
+
+        If btnTambahSoal IsNot Nothing Then
+            btnTambahSoal.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnTambahSoal.Width, btnTambahSoal.Height), 6))
+        End If
+        If btnSoalTabAll IsNot Nothing Then
+            btnSoalTabAll.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnSoalTabAll.Width, btnSoalTabAll.Height), 6))
+            btnSoalTabPedagogik.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnSoalTabPedagogik.Width, btnSoalTabPedagogik.Height), 6))
+            btnSoalTabProfesional.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnSoalTabProfesional.Width, btnSoalTabProfesional.Height), 6))
+            btnSoalTabKepribadian.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnSoalTabKepribadian.Width, btnSoalTabKepribadian.Height), 6))
+            btnSoalTabSosial.Region = New Region(GetRoundedPath(New Rectangle(0, 0, btnSoalTabSosial.Width, btnSoalTabSosial.Height), 6))
+        End If
+        If pnlSoalSearchBox IsNot Nothing Then
+            pnlSoalSearchBox.Region = New Region(GetRoundedPath(New Rectangle(0, 0, pnlSoalSearchBox.Width, pnlSoalSearchBox.Height), 6))
+        End If
     End Sub
 
     ' Navigasi Menu Sidebar
@@ -209,6 +257,10 @@ Public Class AdminDashboardForm
         SwitchMenu("MANAJEMEN_AKUN")
     End Sub
 
+    Private Sub btnNavKelolaSoal_Click(sender As Object, e As EventArgs) Handles btnNavKelolaSoal.Click
+        SwitchMenu("KELOLA_SOAL")
+    End Sub
+
     Public Sub SwitchMenu(menu As String)
         currentMenu = menu
         If menu = "DASHBOARD" Then
@@ -216,25 +268,52 @@ Public Class AdminDashboardForm
             btnNavDashboard.ForeColor = Color.White
             btnNavManajemenAkun.BackColor = Color.Transparent
             btnNavManajemenAkun.ForeColor = colorMuted
+            If btnNavKelolaSoal IsNot Nothing Then
+                btnNavKelolaSoal.BackColor = Color.Transparent
+                btnNavKelolaSoal.ForeColor = colorMuted
+            End If
 
             pnlContent.Visible = True
             If pnlContentAkun IsNot Nothing Then pnlContentAkun.Visible = False
+            If pnlContentSoal IsNot Nothing Then pnlContentSoal.Visible = False
 
             lblBreadcrumbTitle.Text = "Dashboard Admin - Monitoring Prodi"
             lblBreadcrumbSub.Text = "Selamat datang, " & lblSidebarUserName.Text & " (Monitoring seluruh sivitas akademika)"
             SwitchTab(currentTab)
-        Else
+        ElseIf menu = "MANAJEMEN_AKUN" Then
             btnNavManajemenAkun.BackColor = colorNavy
             btnNavManajemenAkun.ForeColor = Color.White
             btnNavDashboard.BackColor = Color.Transparent
             btnNavDashboard.ForeColor = colorMuted
+            If btnNavKelolaSoal IsNot Nothing Then
+                btnNavKelolaSoal.BackColor = Color.Transparent
+                btnNavKelolaSoal.ForeColor = colorMuted
+            End If
 
             pnlContent.Visible = False
             If pnlContentAkun IsNot Nothing Then pnlContentAkun.Visible = True
+            If pnlContentSoal IsNot Nothing Then pnlContentSoal.Visible = False
 
             lblBreadcrumbTitle.Text = "Manajemen Akun - Sistem EDOM"
             lblBreadcrumbSub.Text = "Kelola kredensial, buat akun baru, ubah kata sandi, dan hapus akun sivitas akademika"
             LoadDataAkun()
+        ElseIf menu = "KELOLA_SOAL" Then
+            If btnNavKelolaSoal IsNot Nothing Then
+                btnNavKelolaSoal.BackColor = colorNavy
+                btnNavKelolaSoal.ForeColor = Color.White
+            End If
+            btnNavDashboard.BackColor = Color.Transparent
+            btnNavDashboard.ForeColor = colorMuted
+            btnNavManajemenAkun.BackColor = Color.Transparent
+            btnNavManajemenAkun.ForeColor = colorMuted
+
+            pnlContent.Visible = False
+            If pnlContentAkun IsNot Nothing Then pnlContentAkun.Visible = False
+            If pnlContentSoal IsNot Nothing Then pnlContentSoal.Visible = True
+
+            lblBreadcrumbTitle.Text = "Kelola Soal Kuisioner - Instrumen EDOM"
+            lblBreadcrumbSub.Text = "Kelola bank soal evaluasi dosen secara dinamis: tambah, ubah, dan hapus butir pernyataan"
+            LoadDataSoal()
         End If
         AturLayoutResponsif()
     End Sub
@@ -440,8 +519,10 @@ Public Class AdminDashboardForm
     Private Sub btnRefresh_Click(sender As Object, e As EventArgs) Handles btnRefresh.Click
         If currentMenu = "DASHBOARD" Then
             SwitchTab(currentTab)
-        Else
+        ElseIf currentMenu = "MANAJEMEN_AKUN" Then
             LoadDataAkun()
+        ElseIf currentMenu = "KELOLA_SOAL" Then
+            LoadDataSoal()
         End If
         MessageBox.Show("Data berhasil diperbarui dari server.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
@@ -566,6 +647,26 @@ Public Class AdminDashboardForm
             btnTambahAkun.Left = pnlAkunHeaderRow.Width - btnTambahAkun.Width
             pnlAkunSearchBox.Left = pnlAkunFilterToolbar.Width - pnlAkunSearchBox.Width
             cmbAkunFilterProdi.Left = pnlAkunSearchBox.Left - cmbAkunFilterProdi.Width - 12
+        End If
+
+        If pnlContentSoal IsNot Nothing Then
+            pnlContentSoal.Left = 32
+            pnlContentSoal.Width = w
+            pnlSoalKpiRow.Width = w
+
+            cardSoalTotal.Width = cardW
+            cardSoalAktif.Width = cardW
+            cardSoalAktif.Left = cardW + 16
+            cardSoalKategori.Width = cardW
+            cardSoalKategori.Left = (cardW * 2) + 32
+
+            pnlSoalTableCard.Width = w
+            pnlSoalHeaderRow.Width = w - 40
+            pnlSoalFilterToolbar.Width = w - 40
+            dgvSoal.Width = w - 40
+
+            btnTambahSoal.Left = pnlSoalHeaderRow.Width - btnTambahSoal.Width
+            pnlSoalSearchBox.Left = pnlSoalFilterToolbar.Width - pnlSoalSearchBox.Width
         End If
     End Sub
 
@@ -778,7 +879,9 @@ Public Class AdminDashboardForm
             .Font = New Font("Segoe UI Semibold", 8.25!, FontStyle.Bold),
             .BackColor = If(isActive, colorNavy, Color.White),
             .ForeColor = If(isActive, Color.White, colorMuted),
-            .Cursor = Cursors.Hand
+            .Cursor = Cursors.Hand,
+            .Padding = New Padding(2, 0, 2, 0),
+            .TextAlign = ContentAlignment.MiddleCenter
         }
         btn.FlatAppearance.BorderColor = colorBorder
         btn.FlatAppearance.BorderSize = If(isActive, 0, 1)
@@ -1085,6 +1188,423 @@ Public Class AdminDashboardForm
         Dim rect As New Rectangle(0, 0, pnlAkunSearchBox.Width - 1, pnlAkunSearchBox.Height - 1)
         Dim bdrColor As Color = If(akunSearchFocused, colorNavy, colorBorder)
         Using path As GraphicsPath = GetRoundedPath(rect, 6), penBdr As New Pen(bdrColor, If(akunSearchFocused, 1.5!, 1.0!))
+            e.Graphics.DrawPath(penBdr, path)
+        End Using
+    End Sub
+
+    ' Kelola soal kuisioner view dan CRUD khusus role admin
+    Private Sub InitKelolaSoalView()
+        If pnlContentSoal IsNot Nothing Then Return
+
+        pnlContentSoal = New Panel With {
+            .Location = New Point(32, 24),
+            .Size = New Size(896, 630),
+            .Visible = False
+        }
+
+        ' KPI Row
+        pnlSoalKpiRow = New Panel With {.Location = New Point(0, 0), .Size = New Size(896, 120)}
+        cardSoalTotal = CreateKpiCard("TOTAL SOAL EDOM", "0 Butir", "Instrumen evaluasi terdaftar", Color.FromArgb(37, 99, 235), lblSoalTotalValue)
+        cardSoalAktif = CreateKpiCard("SOAL AKTIF", "0 Aktif", "Ditampilkan dalam kuisioner", Color.FromArgb(5, 150, 105), lblSoalAktifValue)
+        cardSoalKategori = CreateKpiCard("KATEGORI KOMPETENSI", "4 Kategori", "Pedagogik, Profesional, Kepribadian, Sosial", Color.FromArgb(217, 119, 6), lblSoalKategoriValue)
+
+        pnlSoalKpiRow.Controls.Add(cardSoalKategori)
+        pnlSoalKpiRow.Controls.Add(cardSoalAktif)
+        pnlSoalKpiRow.Controls.Add(cardSoalTotal)
+
+        ' Table Card
+        pnlSoalTableCard = New Panel With {
+            .BackColor = Color.White,
+            .Location = New Point(0, 136),
+            .Padding = New Padding(20),
+            .Size = New Size(896, 490)
+        }
+
+        ' Header Row
+        pnlSoalHeaderRow = New Panel With {.Dock = DockStyle.Top, .Height = 50}
+        lblSoalTableTitle = New Label With {
+            .Text = "Bank Soal Kuisioner EDOM",
+            .Font = New Font("Segoe UI", 11.0!, FontStyle.Bold),
+            .ForeColor = colorDark,
+            .Location = New Point(0, 4),
+            .AutoSize = True
+        }
+        lblSoalTableSub = New Label With {
+            .Text = "Kelola butir pernyataan evaluasi dosen secara dinamis. Perubahan langsung tercermin pada kuisioner mahasiswa.",
+            .Font = New Font("Segoe UI", 8.25!),
+            .ForeColor = colorMuted,
+            .Location = New Point(0, 26),
+            .AutoSize = True
+        }
+        btnTambahSoal = New Button With {
+            .Text = "+ Tambah Soal Baru",
+            .Font = New Font("Segoe UI Semibold", 8.5!, FontStyle.Bold),
+            .BackColor = colorNavy,
+            .ForeColor = Color.White,
+            .FlatStyle = FlatStyle.Flat,
+            .Size = New Size(160, 36),
+            .Cursor = Cursors.Hand
+        }
+        btnTambahSoal.FlatAppearance.BorderSize = 0
+        AddHandler btnTambahSoal.Click, AddressOf btnTambahSoal_Click
+
+        pnlSoalHeaderRow.Controls.Add(btnTambahSoal)
+        pnlSoalHeaderRow.Controls.Add(lblSoalTableSub)
+        pnlSoalHeaderRow.Controls.Add(lblSoalTableTitle)
+
+        ' Filter Toolbar
+        pnlSoalFilterToolbar = New Panel With {.Dock = DockStyle.Top, .Height = 44}
+        btnSoalTabAll = CreateTabButton("Semua (0)", 0, True, 95)
+        btnSoalTabPedagogik = CreateTabButton("Pedagogik (0)", 101, False, 122)
+        btnSoalTabProfesional = CreateTabButton("Profesional (0)", 229, False, 126)
+        btnSoalTabKepribadian = CreateTabButton("Kepribadian (0)", 361, False, 126)
+        btnSoalTabSosial = CreateTabButton("Sosial (0)", 493, False, 100)
+
+        AddHandler btnSoalTabAll.Click, Sub() SetSoalCategoryFilter(0)
+        AddHandler btnSoalTabPedagogik.Click, Sub() SetSoalCategoryFilter(1)
+        AddHandler btnSoalTabProfesional.Click, Sub() SetSoalCategoryFilter(2)
+        AddHandler btnSoalTabKepribadian.Click, Sub() SetSoalCategoryFilter(3)
+        AddHandler btnSoalTabSosial.Click, Sub() SetSoalCategoryFilter(4)
+
+        pnlSoalSearchBox = New Panel With {
+            .BackColor = Color.FromArgb(248, 250, 252),
+            .Width = 220,
+            .Height = 32
+        }
+        txtSoalSearch = New TextBox With {
+            .BorderStyle = BorderStyle.None,
+            .BackColor = Color.FromArgb(248, 250, 252),
+            .Font = New Font("Segoe UI", 8.5!),
+            .ForeColor = colorDark,
+            .PlaceholderText = "Cari nomor, kategori, teks...",
+            .Location = New Point(10, 7),
+            .Width = 200
+        }
+        AddHandler txtSoalSearch.TextChanged, Sub() FilterSoalData()
+        AddHandler txtSoalSearch.Enter, Sub()
+                                            soalSearchFocused = True
+                                            pnlSoalSearchBox.Invalidate()
+                                        End Sub
+        AddHandler txtSoalSearch.Leave, Sub()
+                                            soalSearchFocused = False
+                                            pnlSoalSearchBox.Invalidate()
+                                        End Sub
+        AddHandler pnlSoalSearchBox.Paint, AddressOf pnlSoalSearchBox_Paint
+        pnlSoalSearchBox.Controls.Add(txtSoalSearch)
+
+        pnlSoalFilterToolbar.Controls.Add(btnSoalTabAll)
+        pnlSoalFilterToolbar.Controls.Add(btnSoalTabPedagogik)
+        pnlSoalFilterToolbar.Controls.Add(btnSoalTabProfesional)
+        pnlSoalFilterToolbar.Controls.Add(btnSoalTabKepribadian)
+        pnlSoalFilterToolbar.Controls.Add(btnSoalTabSosial)
+        pnlSoalFilterToolbar.Controls.Add(pnlSoalSearchBox)
+
+        ' DataGridView Soal
+        dgvSoal = New DataGridView With {
+            .Dock = DockStyle.Fill,
+            .AllowUserToAddRows = False,
+            .AllowUserToDeleteRows = False,
+            .AllowUserToResizeRows = False,
+            .BackgroundColor = Color.White,
+            .BorderStyle = BorderStyle.None,
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal,
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None,
+            .ColumnHeadersHeight = 44,
+            .ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
+            .GridColor = Color.FromArgb(241, 245, 249),
+            .MultiSelect = False,
+            .ReadOnly = True,
+            .RowHeadersVisible = False,
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+        }
+        dgvSoal.EnableHeadersVisualStyles = False
+        dgvSoal.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(248, 250, 252)
+        dgvSoal.ColumnHeadersDefaultCellStyle.ForeColor = colorMuted
+        dgvSoal.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI Semibold", 8.0!, FontStyle.Bold)
+        dgvSoal.DefaultCellStyle.Font = New Font("Segoe UI", 8.75!)
+        dgvSoal.DefaultCellStyle.ForeColor = colorDark
+        dgvSoal.DefaultCellStyle.SelectionBackColor = Color.FromArgb(241, 245, 249)
+        dgvSoal.DefaultCellStyle.SelectionForeColor = colorDark
+
+        InitDgvSoalColumns()
+        AddHandler dgvSoal.CellPainting, AddressOf dgvSoal_CellPainting
+        AddHandler dgvSoal.CellClick, AddressOf dgvSoal_CellClick
+
+        pnlSoalTableCard.Controls.Add(dgvSoal)
+        pnlSoalTableCard.Controls.Add(pnlSoalFilterToolbar)
+        pnlSoalTableCard.Controls.Add(pnlSoalHeaderRow)
+        AddHandler pnlSoalTableCard.Paint, AddressOf ModernCard_Paint
+
+        pnlContentSoal.Controls.Add(pnlSoalTableCard)
+        pnlContentSoal.Controls.Add(pnlSoalKpiRow)
+
+        pnlScrollBody.Controls.Add(pnlContentSoal)
+    End Sub
+
+    Private Sub InitDgvSoalColumns()
+        dgvSoal.Columns.Clear()
+        dgvSoal.AutoGenerateColumns = False
+        dgvSoal.RowTemplate.Height = 48
+
+        dgvSoal.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colSoalNo", .HeaderText = "NO", .Width = 45, .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter}})
+        dgvSoal.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colSoalNomor", .HeaderText = "URUTAN", .Width = 70, .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter, .Font = New Font("Segoe UI Semibold", 8.5!, FontStyle.Bold)}})
+        dgvSoal.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colSoalKategori", .HeaderText = "KATEGORI", .Width = 135, .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter}})
+        dgvSoal.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colSoalTeks", .HeaderText = "PERNYATAAN / TEKS SOAL EVALUASI", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, .FillWeight = 60.0!})
+        dgvSoal.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colSoalStatus", .HeaderText = "STATUS", .Width = 90, .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter}})
+        dgvSoal.Columns.Add(New DataGridViewTextBoxColumn With {.Name = "colSoalAksi", .HeaderText = "TINDAKAN", .Width = 145, .DefaultCellStyle = New DataGridViewCellStyle With {.Alignment = DataGridViewContentAlignment.MiddleCenter}})
+    End Sub
+
+    Public Sub LoadDataSoal()
+        If dgvSoal Is Nothing Then Return
+        dgvSoal.Rows.Clear()
+
+        Dim list = SoalKuisionerRepository.GetAllSoal()
+
+        Dim countTotal = list.Count
+        Dim countActive = list.Where(Function(s) s.IsActive).Count()
+        Dim countKategori = list.Select(Function(s) s.KategoriIndex).Distinct().Count()
+
+        If lblSoalTotalValue IsNot Nothing Then lblSoalTotalValue.Text = countTotal.ToString() & " Butir"
+        If lblSoalAktifValue IsNot Nothing Then lblSoalAktifValue.Text = countActive.ToString() & " Aktif"
+        If lblSoalKategoriValue IsNot Nothing Then lblSoalKategoriValue.Text = countKategori.ToString() & " Kategori"
+
+        Dim countPed = list.Where(Function(s) s.KategoriIndex = 1).Count()
+        Dim countPro = list.Where(Function(s) s.KategoriIndex = 2).Count()
+        Dim countKep = list.Where(Function(s) s.KategoriIndex = 3).Count()
+        Dim countSos = list.Where(Function(s) s.KategoriIndex = 4).Count()
+
+        If btnSoalTabAll IsNot Nothing Then btnSoalTabAll.Text = "Semua (" & countTotal.ToString() & ")"
+        If btnSoalTabPedagogik IsNot Nothing Then btnSoalTabPedagogik.Text = "Pedagogik (" & countPed.ToString() & ")"
+        If btnSoalTabProfesional IsNot Nothing Then btnSoalTabProfesional.Text = "Profesional (" & countPro.ToString() & ")"
+        If btnSoalTabKepribadian IsNot Nothing Then btnSoalTabKepribadian.Text = "Kepribadian (" & countKep.ToString() & ")"
+        If btnSoalTabSosial IsNot Nothing Then btnSoalTabSosial.Text = "Sosial (" & countSos.ToString() & ")"
+
+        Dim no As Integer = 1
+        For Each s In list
+            Dim rowIndex = dgvSoal.Rows.Add(
+                no,
+                s.Nomor.ToString("D2"),
+                s.KategoriBadgeName,
+                s.Teks,
+                s.StatusText,
+                ""
+            )
+            dgvSoal.Rows(rowIndex).Tag = s
+            no += 1
+        Next
+
+        FilterSoalData()
+    End Sub
+
+    Private Sub SetSoalCategoryFilter(kategoriIndex As Integer)
+        soalCurrentCategoryFilter = kategoriIndex
+        If btnSoalTabAll IsNot Nothing Then
+            btnSoalTabAll.BackColor = If(kategoriIndex = 0, colorNavy, Color.White)
+            btnSoalTabAll.ForeColor = If(kategoriIndex = 0, Color.White, colorMuted)
+            btnSoalTabAll.FlatAppearance.BorderSize = If(kategoriIndex = 0, 0, 1)
+
+            btnSoalTabPedagogik.BackColor = If(kategoriIndex = 1, colorNavy, Color.White)
+            btnSoalTabPedagogik.ForeColor = If(kategoriIndex = 1, Color.White, colorMuted)
+            btnSoalTabPedagogik.FlatAppearance.BorderSize = If(kategoriIndex = 1, 0, 1)
+
+            btnSoalTabProfesional.BackColor = If(kategoriIndex = 2, colorNavy, Color.White)
+            btnSoalTabProfesional.ForeColor = If(kategoriIndex = 2, Color.White, colorMuted)
+            btnSoalTabProfesional.FlatAppearance.BorderSize = If(kategoriIndex = 2, 0, 1)
+
+            btnSoalTabKepribadian.BackColor = If(kategoriIndex = 3, colorNavy, Color.White)
+            btnSoalTabKepribadian.ForeColor = If(kategoriIndex = 3, Color.White, colorMuted)
+            btnSoalTabKepribadian.FlatAppearance.BorderSize = If(kategoriIndex = 3, 0, 1)
+
+            btnSoalTabSosial.BackColor = If(kategoriIndex = 4, colorNavy, Color.White)
+            btnSoalTabSosial.ForeColor = If(kategoriIndex = 4, Color.White, colorMuted)
+            btnSoalTabSosial.FlatAppearance.BorderSize = If(kategoriIndex = 4, 0, 1)
+        End If
+        FilterSoalData()
+    End Sub
+
+    Private Sub FilterSoalData()
+        If dgvSoal Is Nothing Then Return
+        dgvSoal.CurrentCell = Nothing
+        Dim q As String = If(txtSoalSearch IsNot Nothing, txtSoalSearch.Text.Trim().ToLower(), "")
+
+        For Each row As DataGridViewRow In dgvSoal.Rows
+            Dim s = TryCast(row.Tag, SoalKuisionerModel)
+            If s Is Nothing Then Continue For
+
+            Dim matchCat As Boolean = (soalCurrentCategoryFilter = 0 OrElse s.KategoriIndex = soalCurrentCategoryFilter)
+            Dim matchSearch As Boolean = String.IsNullOrEmpty(q) OrElse
+                                         s.Teks.ToLower().Contains(q) OrElse
+                                         s.KategoriBadgeName.ToLower().Contains(q) OrElse
+                                         s.Nomor.ToString().Contains(q)
+
+            row.Visible = matchCat AndAlso matchSearch
+        Next
+    End Sub
+
+    Private Sub dgvSoal_CellPainting(sender As Object, e As DataGridViewCellPaintingEventArgs)
+        If e.RowIndex < 0 Then Return
+
+        ' Kategori Pill Badge
+        If e.ColumnIndex = 2 AndAlso e.Value IsNot Nothing Then
+            e.PaintBackground(e.CellBounds, True)
+            Dim s = TryCast(dgvSoal.Rows(e.RowIndex).Tag, SoalKuisionerModel)
+            Dim katIdx = If(s IsNot Nothing, s.KategoriIndex, 1)
+
+            Dim bgPill As Color
+            Dim txtPill As Color
+            Select Case katIdx
+                Case 1
+                    bgPill = Color.FromArgb(239, 246, 255)
+                    txtPill = Color.FromArgb(29, 78, 216)
+                Case 2
+                    bgPill = Color.FromArgb(243, 232, 255)
+                    txtPill = Color.FromArgb(126, 34, 206)
+                Case 3
+                    bgPill = Color.FromArgb(254, 243, 199)
+                    txtPill = Color.FromArgb(180, 83, 9)
+                Case Else
+                    bgPill = Color.FromArgb(236, 253, 245)
+                    txtPill = Color.FromArgb(4, 120, 87)
+            End Select
+
+            Dim pillRect As New Rectangle(e.CellBounds.X + (e.CellBounds.Width - 96) \ 2, e.CellBounds.Y + (e.CellBounds.Height - 24) \ 2, 96, 24)
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
+            Using path = GetRoundedPath(pillRect, 12), brBg As New SolidBrush(bgPill)
+                e.Graphics.FillPath(brBg, path)
+            End Using
+            Using fontPill As New Font("Segoe UI Semibold", 8.0!, FontStyle.Bold),
+                  brText As New SolidBrush(txtPill),
+                  sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
+                e.Graphics.DrawString(e.Value.ToString(), fontPill, brText, pillRect, sf)
+            End Using
+            e.Handled = True
+            Return
+        End If
+
+        ' Status Pill Badge
+        If e.ColumnIndex = 4 AndAlso e.Value IsNot Nothing Then
+            e.PaintBackground(e.CellBounds, True)
+            Dim isAktif = (e.Value.ToString().ToLower() = "aktif")
+            Dim pillRect As New Rectangle(e.CellBounds.X + (e.CellBounds.Width - 76) \ 2, e.CellBounds.Y + (e.CellBounds.Height - 24) \ 2, 76, 24)
+            Dim bgPill = If(isAktif, Color.FromArgb(236, 253, 245), Color.FromArgb(254, 242, 242))
+            Dim txtPill = If(isAktif, Color.FromArgb(4, 120, 87), Color.FromArgb(220, 38, 38))
+
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
+            Using path = GetRoundedPath(pillRect, 12), brBg As New SolidBrush(bgPill)
+                e.Graphics.FillPath(brBg, path)
+            End Using
+            Using fontPill As New Font("Segoe UI Semibold", 8.0!, FontStyle.Bold),
+                  brText As New SolidBrush(txtPill),
+                  sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
+                e.Graphics.DrawString(If(isAktif, "Aktif", "Nonaktif"), fontPill, brText, pillRect, sf)
+            End Using
+            e.Handled = True
+            Return
+        End If
+
+        ' Tindakan Buttons (Col 5: Edit & Hapus)
+        If e.ColumnIndex = 5 Then
+            e.PaintBackground(e.CellBounds, True)
+            Dim btnH As Integer = 26
+            Dim btnY As Integer = e.CellBounds.Y + (e.CellBounds.Height - btnH) \ 2
+
+            ' Edit Button
+            Dim editRect As New Rectangle(e.CellBounds.X + 12, btnY, 52, btnH)
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
+            Using pathEdit = GetRoundedPath(editRect, 5),
+                  brEditBg As New SolidBrush(Color.FromArgb(239, 246, 255)),
+                  penEditBdr As New Pen(Color.FromArgb(191, 219, 254), 1.0!)
+                e.Graphics.FillPath(brEditBg, pathEdit)
+                e.Graphics.DrawPath(penEditBdr, pathEdit)
+            End Using
+            Using fontBtn As New Font("Segoe UI Semibold", 8.0!, FontStyle.Bold),
+                  brText As New SolidBrush(colorNavy),
+                  sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
+                e.Graphics.DrawString("Edit", fontBtn, brText, editRect, sf)
+            End Using
+
+            ' Hapus Button
+            Dim hapusRect As New Rectangle(e.CellBounds.X + 70, btnY, 58, btnH)
+            Using pathHapus = GetRoundedPath(hapusRect, 5),
+                  brHapusBg As New SolidBrush(Color.FromArgb(254, 242, 242)),
+                  penHapusBdr As New Pen(Color.FromArgb(254, 202, 202), 1.0!)
+                e.Graphics.FillPath(brHapusBg, pathHapus)
+                e.Graphics.DrawPath(penHapusBdr, pathHapus)
+            End Using
+            Using fontBtn As New Font("Segoe UI Semibold", 8.0!, FontStyle.Bold),
+                  brText As New SolidBrush(Color.FromArgb(220, 38, 38)),
+                  sf As New StringFormat With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
+                e.Graphics.DrawString("Hapus", fontBtn, brText, hapusRect, sf)
+            End Using
+
+            e.Handled = True
+            Return
+        End If
+    End Sub
+
+    Private Sub dgvSoal_CellClick(sender As Object, e As DataGridViewCellEventArgs)
+        If e.RowIndex < 0 Then Return
+        If e.ColumnIndex = 5 Then
+            Dim row = dgvSoal.Rows(e.RowIndex)
+            Dim targetSoal = TryCast(row.Tag, SoalKuisionerModel)
+            If targetSoal Is Nothing Then Return
+
+            Dim clickPt = dgvSoal.PointToClient(Cursor.Position)
+            Dim cellDisplay = dgvSoal.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, False)
+            Dim relX = clickPt.X - cellDisplay.X
+
+            If relX >= 12 AndAlso relX <= 64 Then
+                ' EDIT SOAL
+                ShowSoalModal(targetSoal)
+            ElseIf relX >= 70 AndAlso relX <= 130 Then
+                ' HAPUS SOAL
+                Dim konfirmasi = MessageBox.Show(
+                    "Apakah Anda yakin ingin menghapus butir soal nomor " & targetSoal.Nomor.ToString() & " dari kategori " & targetSoal.KategoriBadgeName & "?" & vbCrLf & vbCrLf &
+                    """" & targetSoal.Teks & """",
+                    "Konfirmasi Hapus Soal", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
+
+                If konfirmasi = DialogResult.Yes Then
+                    Dim err As String = ""
+                    If SoalKuisionerRepository.DeleteSoal(targetSoal.Id, err) Then
+                        MessageBox.Show("Butir soal kuisioner berhasil dihapus.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        LoadDataSoal()
+                    Else
+                        MessageBox.Show("Gagal menghapus soal: " & err, "Kesalahan", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    End If
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub btnTambahSoal_Click(sender As Object, e As EventArgs)
+        ShowSoalModal(Nothing)
+    End Sub
+
+    Private Sub ShowSoalModal(Optional soalToEdit As SoalKuisionerModel = Nothing)
+        Using overlay As New Form()
+            overlay.StartPosition = FormStartPosition.Manual
+            overlay.FormBorderStyle = FormBorderStyle.None
+            overlay.Opacity = 0.5R
+            overlay.BackColor = Color.FromArgb(15, 23, 42)
+            overlay.ShowInTaskbar = False
+            overlay.Bounds = Me.Bounds
+            overlay.Show(Me)
+
+            Using modal As New SoalModalForm(soalToEdit)
+                If modal.ShowDialog(overlay) = DialogResult.OK Then
+                    LoadDataSoal()
+                End If
+            End Using
+
+            overlay.Close()
+        End Using
+    End Sub
+
+    Private Sub pnlSoalSearchBox_Paint(sender As Object, e As PaintEventArgs)
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
+        Dim rect As New Rectangle(0, 0, pnlSoalSearchBox.Width - 1, pnlSoalSearchBox.Height - 1)
+        Dim bdrColor As Color = If(soalSearchFocused, colorNavy, colorBorder)
+        Using path As GraphicsPath = GetRoundedPath(rect, 6), penBdr As New Pen(bdrColor, If(soalSearchFocused, 1.5!, 1.0!))
             e.Graphics.DrawPath(penBdr, path)
         End Using
     End Sub
